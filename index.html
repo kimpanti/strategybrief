@@ -860,11 +860,12 @@ function renderSlide(i){
 function buildShareLink(){
   try{
     var json=JSON.stringify({org:S.org,audience:S.audience,horizon:S.horizon,framework:S.framework,slides:S.slides});
-    // Encode: JSON → UTF-8 percent-encoded → base64
+    // Encode to base64 safely handling Unicode
     var b64=btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g,function(_,p1){
       return String.fromCharCode(parseInt(p1,16));
     }));
-    var url=window.location.href.split('?')[0]+'?brief='+encodeURIComponent(b64);
+    // Do NOT encodeURIComponent(b64) — URLSearchParams.get() auto-decodes, so double-encoding breaks the decoder
+    var url=window.location.href.split('?')[0]+'?brief='+b64;
     document.getElementById('share-url').textContent=url;
     document.getElementById('share-url').title=url;
   }catch(e){ document.getElementById('share-url').textContent='Link unavailable (data too large)'; }
@@ -888,8 +889,8 @@ function loadFromLink(){
   var brief=params.get('brief');
   if(!brief) return false;
   try{
-    // Decode: URL-safe base64 → JSON
-    // Pad base64 string if needed
+    // Decode: base64 → UTF-8 JSON
+    // URLSearchParams.get() already URL-decodes, so just handle base64 padding
     var b64=brief.replace(/-/g,'+').replace(/_/g,'/');
     while(b64.length%4) b64+='=';
     var json=decodeURIComponent(Array.prototype.map.call(atob(b64),function(c){
@@ -903,13 +904,11 @@ function loadFromLink(){
     S.slides=d.slides||[];
     if(S.slides.length>0){
       buildOutput();
-      // Ensure disclaimer never shows for shared links
       document.getElementById('disc-modal').classList.remove('show');
       goTo('s-out');
       return true;
     }
   }catch(e){
-    // Corrupted or outdated link — fall through to normal load
     console.warn('StrategyBrief: could not decode shared link', e);
   }
   return false;
@@ -1094,10 +1093,25 @@ function fallbackSlides(){
 }
 
 // ── Init ───────────────────────────────────────
-if(!loadFromLink()){
-  // Fresh load — show disclaimer before anything else
-  document.getElementById('disc-modal').classList.add('show');
-}
+(function(){
+  var hasBriefParam = window.location.search.indexOf('brief=') !== -1;
+  if(!loadFromLink()){
+    if(hasBriefParam){
+      // Link was present but failed to decode — show a clear message instead of broken state
+      document.getElementById('disc-modal').classList.remove('show');
+      document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+      var el=document.getElementById('s-welcome');
+      el.classList.add('active');
+      var notice=document.createElement('div');
+      notice.style.cssText='margin-bottom:16px;padding:12px 16px;background:#fdf4f3;border:1px solid #f5c6c4;border-radius:7px;font-size:13px;color:#8b2318;line-height:1.55';
+      notice.innerHTML='<strong>Link could not be loaded.</strong> The shared link may be incomplete or expired. Please ask for a new link, or start fresh below.';
+      el.querySelector('.card').insertAdjacentElement('afterbegin', notice);
+    } else {
+      // Normal fresh load — show disclaimer
+      document.getElementById('disc-modal').classList.add('show');
+    }
+  }
+})();
 </script>
 </body>
 </html>
