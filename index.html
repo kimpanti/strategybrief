@@ -232,7 +232,63 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--a);cursor:pointer
         <input type="checkbox" id="disc-chk" onchange="updateDisclaimerBtn()"/>
         I have read and accept these terms
       </label>
-      <button class="btn bp" id="disc-accept-btn" disabled onclick="acceptDisclaimer()">Accept &amp; begin</button>
+      <button class="btn bp" id="disc-accept-btn" disabled onclick="acceptDisclaimer()">Accept &amp; continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ API KEY SCREEN ══════════════════ -->
+<div id="s-apikey" class="screen">
+  <div class="id-bar"><div class="wm">Strategy<span>Brief</span></div></div>
+  <div class="card">
+    <div style="background:var(--a);padding:28px 30px 26px;border-radius:var(--r) var(--r) 0 0">
+      <div style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px">One-time setup</div>
+      <div style="font-family:var(--serif);font-size:24px;color:#fff;line-height:1.3;margin-bottom:6px">Connect your Anthropic API key</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.65;max-width:480px">StrategyBrief uses Claude AI to analyse your problem structure and generate your strategy brief. Your key is stored only in this browser session — it is never saved, logged, or sent anywhere except directly to Anthropic.</div>
+    </div>
+    <div style="padding:24px 30px">
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:5px">Anthropic API key</div>
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:8px;line-height:1.5">Paste your key below. It starts with <code style="font-size:11px;background:var(--bg3);padding:1px 5px;border-radius:4px">sk-ant-</code></div>
+        <div style="position:relative">
+          <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" style="padding-right:80px" oninput="updateKeyBtn()"/>
+          <button onclick="toggleKeyVis()" id="key-vis-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:11px;color:var(--ink3);cursor:pointer;padding:4px 6px;font-family:var(--sans)">Show</button>
+        </div>
+        <div id="key-error" style="display:none;font-size:12px;color:#8b2318;margin-top:6px">That doesn't look like a valid Anthropic key. Keys start with <code style="font-size:11px">sk-ant-</code></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px">
+        <div style="border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px">
+          <div style="font-size:18px;margin-bottom:4px">🔒</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">Session only</div>
+          <div style="font-size:11px;color:var(--ink3);line-height:1.5">Cleared when you close this tab. Never stored anywhere.</div>
+        </div>
+        <div style="border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px">
+          <div style="font-size:18px;margin-bottom:4px">💸</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">Low cost</div>
+          <div style="font-size:11px;color:var(--ink3);line-height:1.5">Each brief costs roughly $0.02–$0.05 AUD in API usage.</div>
+        </div>
+        <div style="border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px">
+          <div style="font-size:18px;margin-bottom:4px">⚡</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">Free credits</div>
+          <div style="font-size:11px;color:var(--ink3);line-height:1.5">New accounts receive free credits — enough for several briefs.</div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:14px 16px;margin-bottom:22px">
+        <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:8px">Don't have a key yet?</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6">
+          1. Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--a);font-weight:500">console.anthropic.com</a> and create a free account<br/>
+          2. Navigate to <strong>API Keys</strong> in the left sidebar<br/>
+          3. Click <strong>Create Key</strong>, copy it, and paste it above<br/>
+          <span style="color:var(--ink3);margin-top:4px;display:block">Takes about 3 minutes. New accounts receive free credits automatically.</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:18px;border-top:1px solid var(--bdr)">
+        <button class="btn" onclick="skipApiKey()" style="font-size:12px;color:var(--ink3)">Skip — use template output only</button>
+        <button class="btn bp" id="key-submit-btn" disabled onclick="submitApiKey()" style="padding:10px 26px">Start building →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -264,7 +320,10 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--a);cursor:pointer
       </div>
     </div>
     <div style="padding:20px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-      <div style="font-size:12px;color:var(--ink3)">About 8 minutes · Claude AI · No account required</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="font-size:12px;color:var(--ink3)">About 8 minutes · Claude AI</div>
+        <div id="key-status-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--al2);color:var(--a2);border:1px solid rgba(45,106,79,.2)">API key connected</div>
+      </div>
       <button class="btn bp" onclick="goTo('s-scqa')" style="padding:10px 28px;font-size:14px">Begin →</button>
     </div>
   </div>
@@ -441,7 +500,10 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--a);cursor:pointer
     <div class="sp" id="out-pane"></div>
     <div class="of">
       <span class="ofn">StrategyBrief · SCQA · MECE · Pyramid Principle · Claude AI · Output is AI-assisted — validate before use</span>
-      <button class="btn" onclick="window.location.reload()">Start over</button>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn" style="font-size:11px;padding:5px 12px;color:var(--ink3)" onclick="goTo('s-apikey')">Change API key</button>
+        <button class="btn" onclick="window.location.reload()">Start over</button>
+      </div>
     </div>
   </div>
 </div>
@@ -525,8 +587,39 @@ var S = {
   northStar:'',horizon:'3 years',outcomes:'',
   priorities:'',capabilities:'',risk:'',
   framework:'3 Horizons',tone:'Authoritative & direct',extra:'',
-  slides:[]
+  slides:[],
+  apiKey:''
 };
+
+// ── API key helpers ────────────────────────────
+function apiHeaders(){
+  var h={'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+  if(S.apiKey) h['x-api-key']=S.apiKey;
+  return h;
+}
+function updateKeyBtn(){
+  var val=document.getElementById('api-key-input').value.trim();
+  var err=document.getElementById('key-error');
+  var ok=val===''||val.startsWith('sk-ant-');
+  err.style.display=(val!==''&&!ok)?'block':'none';
+  document.getElementById('key-submit-btn').disabled=!val.startsWith('sk-ant-');
+}
+function toggleKeyVis(){
+  var inp=document.getElementById('api-key-input');
+  var btn=document.getElementById('key-vis-btn');
+  if(inp.type==='password'){inp.type='text';btn.textContent='Hide';}
+  else{inp.type='password';btn.textContent='Show';}
+}
+function submitApiKey(){
+  var val=document.getElementById('api-key-input').value.trim();
+  if(!val.startsWith('sk-ant-')) return;
+  S.apiKey=val;
+  goTo('s-welcome');
+}
+function skipApiKey(){
+  S.apiKey='';
+  goTo('s-welcome');
+}
 
 // ── Disclaimer ─────────────────────────────────
 function updateDisclaimerBtn(){
@@ -534,7 +627,7 @@ function updateDisclaimerBtn(){
 }
 function acceptDisclaimer(){
   document.getElementById('disc-modal').classList.remove('show');
-  goTo('s-welcome');
+  goTo('s-apikey');
 }
 
 // ── Navigation ──────────────────────────────────
@@ -542,6 +635,22 @@ function goTo(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  if(id==='s-welcome') updateKeyBadge();
+}
+function updateKeyBadge(){
+  var badge=document.getElementById('key-status-badge');
+  if(!badge) return;
+  if(S.apiKey){
+    badge.textContent='API key connected ✓';
+    badge.style.background='var(--al2)';badge.style.color='var(--a2)';badge.style.border='1px solid rgba(45,106,79,.2)';
+    badge.title='Click to change key';badge.style.cursor='pointer';
+    badge.onclick=function(){ goTo('s-apikey'); };
+  } else {
+    badge.textContent='No API key — template output only';
+    badge.style.background='var(--gl)';badge.style.color='var(--gold)';badge.style.border='1px solid rgba(181,134,42,.2)';
+    badge.title='Click to add a key';badge.style.cursor='pointer';
+    badge.onclick=function(){ goTo('s-apikey'); };
+  }
 }
 
 // ── Pill toggle ────────────────────────────────
@@ -586,8 +695,13 @@ async function runMece(){
   badge.textContent='Checking…'; badge.className='ms warn';
   body.innerHTML='<div class="mi"><div class="gic ac" style="width:14px;height:14px;font-size:8px">…</div><span style="color:var(--ink3)">Claude is reviewing your options…</span></div>';
   var prompt='You are a McKinsey consultant. Review these strategic options for MECE compliance.\n\nProblem: '+S.keyQuestion+'\nOptions:\n'+S.options+'\n\nReturn ONLY valid JSON (no markdown): {"overall":"pass or warn","badge":"MECE compliant or Needs refinement","checks":[{"pass":true,"text":"..."}],"suggestion":"one sentence if warn, empty string if pass"}';
+  if(!S.apiKey){
+    badge.textContent='No API key'; badge.className='ms warn';
+    body.innerHTML='<div class="mi"><div class="mc f">!</div><span>Add an Anthropic API key on the setup screen to enable live MECE analysis. You can still proceed — the brief will use template output.</span></div>';
+    return;
+  }
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:apiHeaders(),body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
     var d=await res.json();
     var txt=d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
     var p=JSON.parse(txt);
@@ -641,9 +755,13 @@ async function genBrief(){
   S.tone=gs('tn')||'Authoritative & direct';
   S.extra=document.getElementById('q-extra').value;
   goTo('s-gen'); animGen();
+  if(!S.apiKey){
+    setTimeout(function(){ S.slides=fallbackSlides(); buildOutput(); goTo('s-out'); },3500);
+    return;
+  }
   var prompt='You are a senior McKinsey strategy consultant. Generate a board-ready 7-slide strategy brief.\n\nSCQA STRUCTURE:\n- Organisation: '+S.org+'\n- Audience: '+S.audience+'\n- Situation: '+S.situation+'\n- Complication: '+S.complication+'\n- Problem type: '+S.problemType+'\n- Key question: '+S.keyQuestion+'\n- Hypothesis: '+S.hypothesis+'\n- Options (MECE): '+(S.optionsRefined||S.options)+'\n\nSTRATEGIC INPUTS:\n- North star: '+S.northStar+'\n- Horizon: '+S.horizon+'\n- Outcomes: '+S.outcomes+'\n- Priorities: '+S.priorities+'\n- Capabilities: '+S.capabilities+'\n- Risk: '+S.risk+'\n- Framework: '+S.framework+'\n- Tone: '+S.tone+'\n- Context: '+S.extra+'\n\nReturn ONLY a JSON array (no markdown) of exactly 7 slide objects:\n[\n  {"tab":"01 · Executive summary","eyebrow":"Executive summary","heading":"...","lead":"2-3 sentence so-what","type":"summary","bullets":["...","...","..."]},\n  {"tab":"02 · The situation","eyebrow":"Situation & complication","heading":"...","lead":"...","type":"scqa","situation":"...","complication":"...","question":"...","hypothesis":"..."},\n  {"tab":"03 · Strategic ambition","eyebrow":"Strategic ambition","heading":"...","lead":"...","type":"ambition","northstar":"...","outcomes":["...","...","..."]},\n  {"tab":"04 · Strategic options","eyebrow":"Strategic options","heading":"...","lead":"...","type":"options","options":[{"label":"...","desc":"...","verdict":"recommended or viable or not recommended"}]},\n  {"tab":"05 · Strategic priorities","eyebrow":"Strategic priorities","heading":"...","lead":"...","type":"priorities","priorities":[{"num":"01","title":"...","desc":"...","timeframe":"..."}]},\n  {"tab":"06 · Capability agenda","eyebrow":"Capability agenda","heading":"...","lead":"...","type":"capabilities","capabilities":[{"name":"...","action":"Build or Acquire or Partner","urgency":75}]},\n  {"tab":"07 · Roadmap","eyebrow":"Execution roadmap","heading":"...","lead":"...","type":"roadmap","horizons":[{"badge":"H1 · Year 1","badgeClass":"h1c","title":"...","desc":"..."},{"badge":"H2 · Year 2","badgeClass":"h2c","title":"...","desc":"..."},{"badge":"H3 · '+S.horizon+'","badgeClass":"h3c","title":"...","desc":"..."}],"risk":"..."}\n]\n\nMake content specific and insightful using '+S.framework+' framework logic and '+S.tone+' tone.';
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:apiHeaders(),body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
     var d=await res.json();
     var txt=d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
     S.slides=JSON.parse(txt);
@@ -754,7 +872,12 @@ function loadFromLink(){
   try{
     var d=JSON.parse(decodeURIComponent(escape(atob(brief))));
     S.org=d.org||'';S.audience=d.audience||'';S.horizon=d.horizon||'3 years';S.framework=d.framework||'3 Horizons';S.slides=d.slides||[];
-    if(S.slides.length>0){ buildOutput(); document.getElementById('disc-modal').classList.remove('show'); goTo('s-out'); return true; }
+    if(S.slides.length>0){
+      buildOutput();
+      document.getElementById('disc-modal').classList.remove('show');
+      goTo('s-out');
+      return true;
+    }
   }catch(e){}
   return false;
 }
