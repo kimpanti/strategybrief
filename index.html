@@ -214,7 +214,7 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--a);cursor:pointer
 <div class="wrap">
 
 <!-- ══════════════════ DISCLAIMER MODAL ══════════════════ -->
-<div id="disc-modal" class="modal-bg show">
+<div id="disc-modal" class="modal-bg">
   <div class="modal">
     <div class="modal-ttl">Before you begin</div>
     <div class="modal-sub">Please read and accept the following terms before using StrategyBrief.</div>
@@ -845,8 +845,12 @@ function renderSlide(i){
 // ── Share link ─────────────────────────────────
 function buildShareLink(){
   try{
-    var data=btoa(unescape(encodeURIComponent(JSON.stringify({org:S.org,audience:S.audience,horizon:S.horizon,framework:S.framework,slides:S.slides}))));
-    var url=window.location.href.split('?')[0]+'?brief='+data;
+    var json=JSON.stringify({org:S.org,audience:S.audience,horizon:S.horizon,framework:S.framework,slides:S.slides});
+    // Encode: JSON → UTF-8 percent-encoded → base64
+    var b64=btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g,function(_,p1){
+      return String.fromCharCode(parseInt(p1,16));
+    }));
+    var url=window.location.href.split('?')[0]+'?brief='+encodeURIComponent(b64);
     document.getElementById('share-url').textContent=url;
     document.getElementById('share-url').title=url;
   }catch(e){ document.getElementById('share-url').textContent='Link unavailable (data too large)'; }
@@ -870,15 +874,30 @@ function loadFromLink(){
   var brief=params.get('brief');
   if(!brief) return false;
   try{
-    var d=JSON.parse(decodeURIComponent(escape(atob(brief))));
-    S.org=d.org||'';S.audience=d.audience||'';S.horizon=d.horizon||'3 years';S.framework=d.framework||'3 Horizons';S.slides=d.slides||[];
+    // Decode: URL-safe base64 → JSON
+    // Pad base64 string if needed
+    var b64=brief.replace(/-/g,'+').replace(/_/g,'/');
+    while(b64.length%4) b64+='=';
+    var json=decodeURIComponent(Array.prototype.map.call(atob(b64),function(c){
+      return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    var d=JSON.parse(json);
+    S.org=d.org||'';
+    S.audience=d.audience||'';
+    S.horizon=d.horizon||'3 years';
+    S.framework=d.framework||'3 Horizons';
+    S.slides=d.slides||[];
     if(S.slides.length>0){
       buildOutput();
+      // Ensure disclaimer never shows for shared links
       document.getElementById('disc-modal').classList.remove('show');
       goTo('s-out');
       return true;
     }
-  }catch(e){}
+  }catch(e){
+    // Corrupted or outdated link — fall through to normal load
+    console.warn('StrategyBrief: could not decode shared link', e);
+  }
   return false;
 }
 
@@ -1082,7 +1101,8 @@ function fallbackSlides(){
 
 // ── Init ───────────────────────────────────────
 if(!loadFromLink()){
-  goTo('s-welcome');
+  // Fresh load — show disclaimer before anything else
+  document.getElementById('disc-modal').classList.add('show');
 }
 </script>
 </body>
