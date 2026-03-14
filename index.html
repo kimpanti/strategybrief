@@ -557,17 +557,13 @@ input[type=checkbox]{width:15px;height:15px;accent-color:var(--a);cursor:pointer
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Download PPTX
         </button>
-        <button class="export-btn" onclick="exportPDF()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2h-2M9 17H7m4-4H7m10-1v4a1 1 0 01-1 1H9a1 1 0 01-1-1v-4a1 1 0 011-1h6a1 1 0 011 1z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          Export PDF (print)
-        </button>
         <button class="export-btn" onclick="copyLink()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
           <span id="share-btn-txt">Copy shareable link</span>
         </button>
       </div>
       <div style="margin-top:14px;padding:11px 14px;border-radius:var(--rs);background:var(--bg2);border:1px solid var(--bdr);font-size:11px;color:var(--ink3);line-height:1.6">
-        <strong style="color:var(--ink2)">Disclaimer:</strong> The PPTX and shareable link contain your strategy inputs. Do not share outside your organisation if inputs contain sensitive or confidential information. AI-generated content should be reviewed by qualified professionals before use in any official capacity.
+        <strong style="color:var(--ink2)">Disclaimer:</strong> The PPTX and shareable link contain your strategy inputs. Do not share outside your organisation if inputs contain sensitive or confidential information. AI-generated content should be reviewed by qualified professionals before use in any official capacity. To export as PDF, open the PPTX in PowerPoint or Google Slides and use File → Save as PDF.
       </div>
     </div>
     <div class="of" style="padding:12px 26px">
@@ -696,8 +692,26 @@ async function runMece(){
   body.innerHTML='<div class="mi"><div class="gic ac" style="width:14px;height:14px;font-size:8px">…</div><span style="color:var(--ink3)">Claude is reviewing your options…</span></div>';
   var prompt='You are a McKinsey consultant. Review these strategic options for MECE compliance.\n\nProblem: '+S.keyQuestion+'\nOptions:\n'+S.options+'\n\nReturn ONLY valid JSON (no markdown): {"overall":"pass or warn","badge":"MECE compliant or Needs refinement","checks":[{"pass":true,"text":"..."}],"suggestion":"one sentence if warn, empty string if pass"}';
   if(!S.apiKey){
-    badge.textContent='No API key'; badge.className='ms warn';
-    body.innerHTML='<div class="mi"><div class="mc f">!</div><span>Add an Anthropic API key on the setup screen to enable live MECE analysis. You can still proceed — the brief will use template output.</span></div>';
+    // No API key — run a basic static analysis on the options text client-side
+    var lines=S.options.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var count=lines.length;
+    var hasOverlap=false;
+    var tooFew=count<2;
+    var tooMany=count>5;
+    // Simple heuristic: check if any two lines share the same opening word (likely overlap)
+    var firstWords=lines.map(function(l){return l.replace(/^(option\s*\d+[:\-\.]?\s*|[\d]+[:\-\.]\s*)/i,'').split(/\s+/)[0].toLowerCase();});
+    var seen={};
+    firstWords.forEach(function(w){ if(w) seen[w]=(seen[w]||0)+1; });
+    hasOverlap=Object.keys(seen).some(function(w){ return seen[w]>1 && w.length>3; });
+    var checks=[
+      {pass:count>=2, text:count>=2 ? count+' distinct options identified — enough to structure a genuine choice' : 'Fewer than 2 options listed — add at least one more to enable MECE analysis'},
+      {pass:!tooMany, text:!tooMany ? 'Option count is within the recommended range (2–5)' : 'More than 5 options may dilute focus — consider consolidating'},
+      {pass:!hasOverlap, text:!hasOverlap ? 'No obvious label overlaps detected between options' : 'Some options appear to share similar themes — review for mutual exclusivity'},
+      {pass:count>=2, text:'Add an Anthropic API key for a full AI-powered MECE review with specific recommendations'}
+    ];
+    var allPass=checks.slice(0,3).every(function(c){return c.pass;});
+    badge.textContent=allPass?'Basic checks passed':'Review options'; badge.className='ms '+(allPass?'ok':'warn');
+    body.innerHTML=checks.map(function(c){return '<div class="mi"><div class="mc '+(c.pass?'p':'f')+'">'+(c.pass?'✓':'!')+'</div><span>'+c.text+'</span></div>';}).join('');
     return;
   }
   try{
@@ -1062,26 +1076,6 @@ async function exportPPTX(){
     alert('Export failed: '+err.message);
   }
   btn.disabled=false; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Download PPTX';
-}
-
-// ── PDF Export ─────────────────────────────────
-function exportPDF(){
-  var w=window.open('','_blank');
-  if(!w){ alert('Please allow pop-ups for this page to export PDF, then try again.'); return; }
-  w.document.write('<html lang="en-AU"><head><title>'+S.org+' Strategy Brief</title><style>body{margin:0;font-family:Georgia,serif;background:#fff}@page{size:A4 landscape;margin:0}.slide{width:297mm;height:210mm;page-break-after:always;display:flex;flex-direction:column;position:relative;overflow:hidden;background:#f7f6f3}.top-bar{background:#1a3a5c;padding:8px 24px;display:flex;justify-content:space-between;align-items:center;color:#fff}.ey{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;font-family:sans-serif}.sn{font-size:10px;opacity:.6;font-family:sans-serif}.body{padding:18px 28px 14px;flex:1}.acl{border-left:4px solid #b5862a;padding:0 0 0 12px;margin-bottom:10px}.h{font-size:22px;font-weight:bold;color:#1a3a5c;line-height:1.25;margin:0 0 4px}.lead{font-size:12px;color:#555;line-height:1.6;font-family:sans-serif;margin-bottom:14px}.item{font-size:12px;color:#222;line-height:1.55;font-family:sans-serif;margin-bottom:5px;padding:8px 12px;background:#fff;border-left:3px solid #1a3a5c}.ft{background:#eceae6;padding:6px 24px;display:flex;justify-content:space-between;font-size:9px;color:#888;font-family:sans-serif}@media print{.slide{page-break-after:always}}</style></head><body>');
-  S.slides.forEach(function(s,i){
-    w.document.write('<div class="slide"><div class="top-bar"><span class="ey">'+s.eyebrow+'</span><span class="sn">'+(i+1)+'/'+S.slides.length+'</span></div><div class="body"><div class="acl"><div class="h">'+s.heading+'</div></div><div class="lead">'+s.lead+'</div>');
-    if(s.type==='summary'){ (s.bullets||[]).forEach(function(b){ w.document.write('<div class="item">'+b+'</div>'); }); }
-    if(s.type==='scqa'){ ['Situation','Complication','Question','Hypothesis'].forEach(function(x){ var k=x.toLowerCase(); w.document.write('<div class="item"><strong>'+x+':</strong> '+(s[k]||'')+'</div>'); }); }
-    if(s.type==='ambition'){ w.document.write('<div class="item" style="font-style:italic;font-size:13px">'+(s.northstar||'')+'</div>'); (s.outcomes||[]).forEach(function(o){ w.document.write('<div class="item">'+o+'</div>'); }); }
-    if(s.type==='options'){ (s.options||[]).forEach(function(o){ w.document.write('<div class="item"><strong>'+o.label+'</strong> ['+o.verdict+'] — '+o.desc+'</div>'); }); }
-    if(s.type==='priorities'){ (s.priorities||[]).forEach(function(p,j){ w.document.write('<div class="item"><strong>0'+(j+1)+' '+p.title+'</strong><br/>'+p.desc+'</div>'); }); }
-    if(s.type==='capabilities'){ (s.capabilities||[]).forEach(function(c){ w.document.write('<div class="item">'+c.name+' — '+(c.action||'Build')+'</div>'); }); }
-    if(s.type==='roadmap'){ (s.horizons||[]).forEach(function(hz){ w.document.write('<div class="item"><strong>'+hz.badge+' · '+hz.title+'</strong><br/>'+hz.desc+'</div>'); }); }
-    w.document.write('</div><div class="ft"><span>'+S.org+' · Strategy Brief · Confidential</span><span>AI-generated — validate before official use</span></div></div>');
-  });
-  w.document.write('</body></html>'); w.document.close();
-  setTimeout(function(){ w.print(); },700);
 }
 
 // ── Fallback slides ────────────────────────────
