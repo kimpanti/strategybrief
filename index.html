@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>StrategyBrief — Problem · Brief · Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs/dist/pptxgen.bundle.js"></script>
+<style>
+:root{
+  --ink:#0f0f0f;--ink2:#444;--ink3:#777;--ink4:#aaa;
+  --bg:#fff;--bg2:#f7f6f3;--bg3:#eeecea;
+  --a:#1a3a5c;--a2:#2d6a4f;--gold:#b5862a;
+  --al:#e8eef5;--al2:#e5f3ec;--gl:#faf3e8;
+  --bdr:rgba(0,0,0,.09);--bdr2:rgba(0,0,0,.15);
+  --r:12px;--rs:7px;--sans:'DM Sans',sans-serif;--serif:'DM Serif Display',serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px}
+body{font-family:var(--sans);background:var(--bg2);color:var(--ink);min-height:100vh}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+.screen{display:none}.screen.active{display:block}
+
+/* Identity */
+.id-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.wm{font-family:var(--serif);font-size:20px;color:var(--ink);letter-spacing:-.02em}
+.wm span{color:var(--a)}
+.phase-track{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink3)}
+.pt{display:flex;align-items:center;gap:5px}
+.pd{width:7px;height:7px;border-radius:50%;background:var(--bg3)}
+.pd.done{background:var(--a)}
+.pd.active{background:var(--a);box-shadow:0 0 0 3px var(--al)}
+.pt-sep{color:var(--ink4);font-size:10px}
+
+/* Card */
+.card{background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:0 2px 18px rgba(0,0,0,.06);position:relative}
+
+/* Section top */
+.st{padding:26px 30px 0}
+.ey{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--a);margin-bottom:6px}
+.ttl{font-family:var(--serif);font-size:28px;color:var(--ink);line-height:1.25;margin-bottom:5px}
+.sub{font-size:13px;color:var(--ink3);line-height:1.65;max-width:500px}
+
+/* Progress */
+.pb{height:2px;background:var(--bg3);margin:18px 30px 0;border-radius:2px}
+.pbf{height:100%;background:var(--a);border-radius:2px;transition:width .4s}
+
+/* Form */
+.fa{padding:22px 30px 26px}
+.qg{margin-bottom:20px}
+.qg:last-child{margin-bottom:0}
+.ql{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.qh{font-size:12px;color:var(--ink3);margin-bottom:7px;line-height:1.5}
+textarea,input[type=text],select{
+  width:100%;font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:var(--bg2);border:1px solid var(--bdr2);border-radius:var(--rs);
+  padding:10px 13px;outline:none;resize:none;line-height:1.6;
+  transition:border-color .15s,background .15s;
+}
+textarea:focus,input[type=text]:focus,select:focus{border-color:var(--a);background:var(--bg)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.pr{display:flex;gap:7px;flex-wrap:wrap}
+.pi{font-size:12px;padding:5px 13px;border-radius:20px;border:1px solid var(--bdr2);color:var(--ink2);cursor:pointer;background:var(--bg);transition:all .15s;user-select:none}
+.pi.on{background:var(--al);color:var(--a);border-color:var(--a)}
+.pi.on.g{background:var(--al2);color:var(--a2);border-color:var(--a2)}
+
+/* Tags */
+.tg{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase}
+.ts{background:var(--al);color:var(--a)}
+.tc{background:#fdecea;color:#8b2318}
+.tq{background:var(--gl);color:var(--gold)}
+.ta{background:var(--al2);color:var(--a2)}
+.tm{background:var(--bg3);color:var(--ink2)}
+
+/* Nav row */
+.nr{display:flex;align-items:center;justify-content:space-between;padding:16px 30px 22px;border-top:1px solid var(--bdr)}
+.sc{font-size:12px;color:var(--ink3)}
+.btn{font-family:var(--sans);font-size:13px;font-weight:500;padding:9px 20px;border-radius:var(--rs);cursor:pointer;border:1px solid var(--bdr2);background:transparent;color:var(--ink2);transition:all .15s}
+.btn:hover{background:var(--bg3)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.bp{background:var(--a);color:#fff;border-color:var(--a)}.bp:hover{opacity:.88;background:var(--a)}
+.bg{background:var(--gold);color:#fff;border-color:var(--gold)}.bg:hover{opacity:.88;background:var(--gold)}
+.br{display:flex;gap:8px}
+
+/* MECE */
+.mp{border:1px solid var(--bdr);border-radius:var(--rs);overflow:hidden;margin-top:8px}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--bg2);border-bottom:1px solid var(--bdr)}
+.mt2{font-size:12px;font-weight:500;color:var(--ink2)}
+.ms{font-size:11px;padding:2px 8px;border-radius:20px}
+.ms.ok{background:var(--al2);color:var(--a2)}.ms.warn{background:var(--gl);color:var(--gold)}
+.mb{padding:10px 14px}
+.mi{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;color:var(--ink2)}
+.mi:last-child{margin-bottom:0}
+.mc{width:14px;height:14px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px}
+.mc.p{background:var(--al2);color:var(--a2)}.mc.f{background:var(--gl);color:var(--gold)}
+
+/* Disclaimer modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--bg);border-radius:var(--r);max-width:520px;width:100%;padding:28px 30px;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-ttl{font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.6}
+.disc-body{font-size:12px;color:var(--ink2);line-height:1.7;background:var(--bg2);border-radius:var(--rs);padding:14px 16px;margin-bottom:18px;max-height:220px;overflow-y:auto;border:1px solid var(--bdr)}
+.disc-body p{margin-bottom:10px}.disc-body p:last-child{margin-bottom:0}
+.disc-body strong{color:var(--ink);font-weight:500}
+.modal-row{display:flex;align-items:center;gap:10px}
+.chk-row{display:flex;align-items:center;gap:8px;flex:1;font-size:12px;color:var(--ink2);cursor:pointer}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--a);cursor:pointer;flex-shrink:0}
+
+/* Handoff */
+.hh{padding:34px 30px 26px;text-align:center}
+.hi{width:50px;height:50px;border-radius:50%;background:var(--al);margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.ht{font-family:var(--serif);font-size:24px;color:var(--ink);margin-bottom:7px}
+.hs{font-size:13px;color:var(--ink3);line-height:1.65;max-width:400px;margin:0 auto 22px}
+.hcg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 30px 22px}
+.hc{border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px;text-align:left;background:var(--bg2)}
+.hcl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:4px}
+.hcv{font-size:12px;color:var(--ink);line-height:1.45}
+
+/* Generating */
+.gw{padding:44px 30px;text-align:center}
+.gt{font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:6px}
+.gsb{font-size:13px;color:var(--ink3);margin-bottom:26px}
+.gl2{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto}
+.gi2{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink2);text-align:left}
+.gic{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--bdr2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ink3);transition:all .3s}
+.gic.ac{border-color:var(--a);color:var(--a)}.gic.dn{background:var(--a);border-color:var(--a);color:#fff;font-size:9px}
+
+/* Output */
+.oh{padding:18px 26px;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ot{font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:3px}
+.om{font-size:12px;color:var(--ink3)}
+.stabs{display:flex;border-bottom:1px solid var(--bdr);overflow-x:auto}
+.stab{font-size:12px;padding:10px 17px;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.stab.active{color:var(--a);border-bottom-color:var(--a);font-weight:500}
+.sp{padding:28px 30px 26px;min-height:300px}
+.sey{font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--a);margin-bottom:8px}
+.sh{font-family:var(--serif);font-size:23px;color:var(--ink);line-height:1.28;margin-bottom:7px}
+.sl{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:20px;max-width:560px}
+.two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.ic2{border:1px solid var(--bdr);border-radius:var(--rs);padding:13px 15px;background:var(--bg2)}
+.icl{font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.icv{font-size:13px;color:var(--ink);line-height:1.45}
+.of{padding:12px 26px;border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.ofn{font-size:11px;color:var(--ink4)}
+
+/* Phase 3 */
+.brand-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.swatch-wrap{text-align:center}
+.swatch-label{font-size:11px;color:var(--ink3);margin-bottom:5px}
+.swatch-input{width:100%;height:38px;border:1px solid var(--bdr2);border-radius:var(--rs);cursor:pointer;padding:2px}
+.deck-preview{border:1px solid var(--bdr);border-radius:var(--rs);overflow:hidden;background:var(--bg2)}
+.dp-top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--bdr);background:var(--bg)}
+.dp-label{font-size:12px;font-weight:500;color:var(--ink2)}
+.slide-grid-preview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:14px}
+.sgp{border-radius:5px;overflow:hidden;cursor:pointer;transition:transform .15s;border:2px solid transparent}
+.sgp:hover{transform:scale(1.02)}.sgp.sel{border-color:var(--a)}
+.sgp-head{height:18px;font-size:8px;display:flex;align-items:center;padding:0 6px;font-weight:500;color:#fff}
+.sgp-body{padding:6px;background:#fff}
+.sgp-line{height:4px;border-radius:2px;background:var(--bg3);margin-bottom:4px}
+.sgp-line.acc{background:var(--bg3);width:55%}
+.export-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.export-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;padding:10px 18px;border-radius:var(--rs);border:1px solid var(--bdr2);background:var(--bg);color:var(--ink2);cursor:pointer;transition:all .15s}
+.export-btn:hover{background:var(--bg3)}
+.export-btn.primary{background:var(--a);color:#fff;border-color:var(--a)}.export-btn.primary:hover{opacity:.88}
+.export-btn svg{flex-shrink:0}
+
+/* Share */
+.share-box{display:flex;gap:8px;align-items:center;margin-top:14px}
+.share-input{flex:1;font-size:12px;padding:8px 12px;border-radius:var(--rs);border:1px solid var(--bdr2);background:var(--bg2);color:var(--ink2);font-family:var(--sans);cursor:text}
+.copy-btn{font-size:12px;padding:8px 14px;border-radius:var(--rs);border:1px solid var(--bdr2);background:var(--bg);color:var(--ink2);cursor:pointer;white-space:nowrap;transition:all .15s}
+.copy-btn:hover{background:var(--bg3)}
+.copy-btn.copied{background:var(--al2);color:var(--a2);border-color:var(--a2)}
+
+/* Spinner */
+.spin{width:20px;height:20px;border:2px solid var(--bdr2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.ai-ld{display:none;position:absolute;inset:0;background:rgba(247,246,243,.87);border-radius:var(--r);align-items:center;justify-content:center;flex-direction:column;gap:9px;z-index:10}
+.ai-ld.show{display:flex}.ai-ld-t{font-size:13px;color:var(--ink2)}
+
+/* Inline slide content */
+.scqa-card{border-left:3px solid var(--a);padding:11px 15px;background:var(--bg2);border-radius:0 var(--rs) var(--rs) 0;margin-bottom:9px}
+.scqa-tag{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--a);margin-bottom:4px}
+.scqa-txt{font-size:13px;color:var(--ink);line-height:1.5}
+.pri-list{display:flex;flex-direction:column;gap:8px}
+.pri-item{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 15px;background:var(--bg)}
+.pri-n{font-family:var(--serif);font-size:22px;color:#ddd;font-style:italic;flex-shrink:0;line-height:1;margin-top:1px}
+.pt2{font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.pd2{font-size:12px;color:var(--ink3);line-height:1.5}
+.bar-stack{display:flex;flex-direction:column;gap:10px}
+.bar-top{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-bottom:4px}
+.bar-top span{color:var(--ink3)}
+.bar-bg{height:5px;background:var(--bg3);border-radius:3px}
+.bar-fill{height:100%;border-radius:3px;background:var(--a)}
+.h-row{display:flex;flex-direction:column;gap:8px}
+.h-item{display:flex;gap:13px;align-items:flex-start;border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 15px}
+.h-bdg{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;flex-shrink:0;margin-top:2px;white-space:nowrap;color:#fff}
+.h1c{background:var(--a)}.h2c{background:var(--a2)}.h3c{background:var(--gold)}
+.risk-p{border:1px solid #f5c6c4;background:#fdf4f3;border-radius:var(--rs);padding:12px 15px;margin-top:10px}
+.risk-l{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:#8b2318;margin-bottom:4px}
+.risk-t{font-size:13px;color:var(--ink);line-height:1.5}
+
+@media(max-width:600px){
+  .wrap{padding:18px 12px 60px}
+  .st,.fa,.nr{padding-left:18px;padding-right:18px}
+  .hcg{margin-left:18px;margin-right:18px}
+  .brand-row{grid-template-columns:repeat(2,1fr)}
+  .sp{padding:20px 18px}
+  .slide-grid-preview{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══════════════════ DISCLAIMER MODAL ══════════════════ -->
+<div id="disc-modal" class="modal-bg show">
+  <div class="modal">
+    <div class="modal-ttl">Before you begin</div>
+    <div class="modal-sub">Please read and accept the following terms before using StrategyBrief.</div>
+    <div class="disc-body">
+      <p><strong>Data processing &amp; AI.</strong> This tool uses the Anthropic Claude API to generate strategy content. Any information you enter — including organisation details, competitive context, and strategic priorities — is sent to Anthropic's servers for processing. By using this tool you consent to this processing. Do not enter classified, legally privileged, or personally identifiable information.</p>
+      <p><strong>Data storage.</strong> StrategyBrief does not store, log, or retain your inputs on its own servers. However, Anthropic may retain API inputs and outputs in accordance with its <a href="https://www.anthropic.com/privacy" target="_blank" style="color:var(--a)">Privacy Policy</a> and <a href="https://www.anthropic.com/usage-policies" target="_blank" style="color:var(--a)">Usage Policies</a>. Review these policies before entering sensitive information.</p>
+      <p><strong>Shareable links.</strong> The "Copy shareable link" feature encodes your strategy brief data in a URL using base64 encoding. Anyone with this link can view your brief. Do not share links containing confidential or proprietary information outside your organisation.</p>
+      <p><strong>No professional advice.</strong> Content generated by StrategyBrief is AI-assisted and intended for brainstorming and structuring purposes only. It does not constitute legal, financial, investment, or professional strategic advice. Always engage qualified advisers for consequential decisions.</p>
+      <p><strong>Accuracy.</strong> AI-generated content may contain errors, omissions, or plausible-sounding inaccuracies. All output should be reviewed and validated by qualified professionals before use in any official capacity.</p>
+      <p><strong>Intellectual property.</strong> You retain ownership of the inputs you provide. Generated outputs are provided for your use, subject to Anthropic's terms of service.</p>
+      <p><strong>Jurisdiction.</strong> This tool is made available without warranty. Use is at your own risk.</p>
+    </div>
+    <div class="modal-row">
+      <label class="chk-row" id="disc-chk-label">
+        <input type="checkbox" id="disc-chk" onchange="updateDisclaimerBtn()"/>
+        I have read and accept these terms
+      </label>
+      <button class="btn bp" id="disc-accept-btn" disabled onclick="acceptDisclaimer()">Accept &amp; continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ API KEY SCREEN ══════════════════ -->
+<div id="s-apikey" class="screen">
+  <div class="id-bar"><div class="wm">Strategy<span>Brief</span></div></div>
+  <div class="card">
+    <div style="background:var(--a);padding:28px 30px 26px;border-radius:var(--r) var(--r) 0 0">
+      <div style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px">One-time setup</div>
+      <div style="font-family:var(--serif);font-size:24px;color:#fff;line-height:1.3;margin-bottom:6px">Connect your Anthropic API key</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.65;max-width:480px">StrategyBrief uses Claude AI to analyse your problem structure and generate your strategy brief. Your key is stored only in this browser session — it is never saved, logged, or sent anywhere except directly to Anthropic.</div>
+    </div>
+    <div style="padding:24px 30px">
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:5px">Anthropic API key</div>
+        <div style="font-size:12px;color:var(--ink3);margin-bottom:8px;line-height:1.5">Paste your key below. It starts with <code style="font-size:11px;background:var(--bg3);padding:1px 5px;border-radius:4px">sk-ant-</code></div>
+        <div style="position:relative">
+          <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" style="padding-right:80px" oninput="updateKeyBtn()"/>
+          <button onclick="toggleKeyVis()" id="key-vis-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:11px;color:var(--ink3);cursor:pointer;padding:4px 6px;font-family:var(--sans)">Show</button>
+        </div>
+        <div id="key-error" style="display:none;font-size:12px;color:#8b2318;margin-top:6px">That doesn't look like a valid Anthropic key. Keys start with <code style="font-size:11px">sk-ant-</code></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px">
+        <div style="border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px">
+          <div style="font-size:18px;margin-bottom:4px">🔒</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">Session only</div>
+          <div style="font-size:11px;color:var(--ink3);line-height:1.5">Cleared when you close this tab. Never stored anywhere.</div>
+        </div>
+        <div style="border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px">
+          <div style="font-size:18px;margin-bottom:4px">💸</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">Low cost</div>
+          <div style="font-size:11px;color:var(--ink3);line-height:1.5">Each brief costs roughly $0.02–$0.05 AUD in API usage.</div>
+        </div>
+        <div style="border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px">
+          <div style="font-size:18px;margin-bottom:4px">⚡</div>
+          <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px">Free credits</div>
+          <div style="font-size:11px;color:var(--ink3);line-height:1.5">New accounts receive free credits — enough for several briefs.</div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:14px 16px;margin-bottom:22px">
+        <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:8px">Don't have a key yet?</div>
+        <div style="font-size:12px;color:var(--ink2);line-height:1.6">
+          1. Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--a);font-weight:500">console.anthropic.com</a> and create a free account<br/>
+          2. Navigate to <strong>API Keys</strong> in the left sidebar<br/>
+          3. Click <strong>Create Key</strong>, copy it, and paste it above<br/>
+          <span style="color:var(--ink3);margin-top:4px;display:block">Takes about 3 minutes. New accounts receive free credits automatically.</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-top:18px;border-top:1px solid var(--bdr)">
+        <button class="btn" onclick="skipApiKey()" style="font-size:12px;color:var(--ink3)">Skip — use template output only</button>
+        <button class="btn bp" id="key-submit-btn" disabled onclick="submitApiKey()" style="padding:10px 26px">Start building →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ WELCOME ══════════════════ -->
+<div id="s-welcome" class="screen">
+  <div class="id-bar"><div class="wm">Strategy<span>Brief</span></div></div>
+  <div class="card" style="overflow:hidden">
+    <div style="background:var(--a);padding:38px 32px 34px">
+      <div style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:9px">Problem · Brief · Deck</div>
+      <div style="font-family:var(--serif);font-size:34px;color:#fff;line-height:1.22;margin-bottom:11px">From messy problem<br/>to boardroom deck.</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.68);line-height:1.7;max-width:460px">Structure your thinking with SCQA and MECE before writing a single strategy word — then generate a consulting-grade brief and a Gamma-style visual deck.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--bdr)">
+      <div style="padding:18px 22px;border-right:1px solid var(--bdr)">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--a);margin-bottom:6px">Phase 1</div>
+        <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px">Problem structuring</div>
+        <div style="font-size:12px;color:var(--ink3);line-height:1.5">SCQA · MECE · Pyramid Principle</div>
+      </div>
+      <div style="padding:18px 22px;border-right:1px solid var(--bdr)">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--a2);margin-bottom:6px">Phase 2</div>
+        <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px">Strategy brief</div>
+        <div style="font-size:12px;color:var(--ink3);line-height:1.5">AI-generated consulting deck</div>
+      </div>
+      <div style="padding:18px 22px">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Phase 3</div>
+        <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:3px">Visual deck</div>
+        <div style="font-size:12px;color:var(--ink3);line-height:1.5">Branded PPTX export</div>
+      </div>
+    </div>
+    <div style="padding:20px 26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="font-size:12px;color:var(--ink3)">About 8 minutes · Claude AI</div>
+        <div id="key-status-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:var(--al2);color:var(--a2);border:1px solid rgba(45,106,79,.2)">API key connected</div>
+      </div>
+      <button class="btn bp" onclick="goTo('s-scqa')" style="padding:10px 28px;font-size:14px">Begin →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PHASE 1 — SCQA ══════════════════ -->
+<div id="s-scqa" class="screen">
+  <div class="id-bar">
+    <div class="wm">Strategy<span>Brief</span></div>
+    <div class="phase-track">
+      <div class="pt"><div class="pd active" id="pd1a"></div><span>Problem</span></div>
+      <div class="pt-sep">→</div>
+      <div class="pt"><div class="pd" id="pd2a"></div><span>Brief</span></div>
+      <div class="pt-sep">→</div>
+      <div class="pt"><div class="pd" id="pd3a"></div><span>Deck</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div id="ald-scqa" class="ai-ld"><div class="spin"></div><div class="ai-ld-t" id="ald-scqa-t">Analysing…</div></div>
+    <!-- Step 1 -->
+    <div id="sc1">
+      <div class="st"><div class="ey">Phase 1 · Step 1 of 4 · Situation</div><div class="ttl">What's the context?</div><div class="sub">Describe what is undeniably true right now — facts your audience would already agree with.</div></div>
+      <div class="pb"><div class="pbf" style="width:25%"></div></div>
+      <div class="fa">
+        <div class="qg"><div class="ql"><span class="tg ts">S — Situation</span></div><div class="qh">The stable backdrop — no opinions, no problems yet. Just accepted reality.</div><textarea id="q-sit" rows="3" placeholder="e.g. We are a mid-sized logistics company with $800M revenue operating across 6 Australian states. The industry is undergoing rapid digitisation and our competitors have begun investing heavily in automation."></textarea></div>
+        <div class="qg"><div class="ql">Organisation name</div><input type="text" id="q-org" placeholder="e.g. Meridian Logistics"/></div>
+        <div class="qg" style="margin-bottom:0"><div class="ql">Audience for this strategy</div><div class="pr" id="pr-aud"><span class="pi" onclick="tp(this,'aud')">Board</span><span class="pi on" onclick="tp(this,'aud')">C-suite</span><span class="pi" onclick="tp(this,'aud')">Investors</span><span class="pi" onclick="tp(this,'aud')">Senior leadership</span><span class="pi" onclick="tp(this,'aud')">Regulators</span></div></div>
+      </div>
+      <div class="nr"><span class="sc">Step 1 of 8</span><button class="btn bp" onclick="scNext(1)">Continue →</button></div>
+    </div>
+    <!-- Step 2 -->
+    <div id="sc2" style="display:none">
+      <div class="st"><div class="ey">Phase 1 · Step 2 of 4 · Complication</div><div class="ttl">What's changed or gone wrong?</div><div class="sub">The disruption that makes the situation unstable. This is the trigger for your strategy.</div></div>
+      <div class="pb"><div class="pbf" style="width:50%"></div></div>
+      <div class="fa">
+        <div class="qg"><div class="ql"><span class="tg tc">C — Complication</span></div><div class="qh">What has changed, emerged, or threatened that demands a strategic response?</div><textarea id="q-comp" rows="3" placeholder="e.g. However, our legacy IT infrastructure cannot support real-time tracking and automated routing that major clients now expect. We've lost two enterprise contracts in six months to a tech-native competitor."></textarea></div>
+        <div class="qg" style="margin-bottom:0"><div class="ql">What type of problem is this primarily?</div><div class="pr" id="pr-pt"><span class="pi" onclick="tp(this,'pt')">Competitive threat</span><span class="pi on" onclick="tp(this,'pt')">Capability gap</span><span class="pi" onclick="tp(this,'pt')">Market shift</span><span class="pi" onclick="tp(this,'pt')">Performance decline</span><span class="pi" onclick="tp(this,'pt')">Regulatory pressure</span><span class="pi" onclick="tp(this,'pt')">Growth plateau</span></div></div>
+      </div>
+      <div class="nr"><button class="btn" onclick="scBack(2)">← Back</button><button class="btn bp" onclick="scNext(2)">Continue →</button></div>
+    </div>
+    <!-- Step 3 -->
+    <div id="sc3" style="display:none">
+      <div class="st"><div class="ey">Phase 1 · Step 3 of 4 · Question &amp; Hypothesis</div><div class="ttl">What must we answer?</div><div class="sub">A great key question is specific, decision-forcing, and answerable. The hypothesis is your current best belief.</div></div>
+      <div class="pb"><div class="pbf" style="width:75%"></div></div>
+      <div class="fa">
+        <div class="qg"><div class="ql"><span class="tg tq">Q — Key question</span></div><div class="qh">The single question your strategy must resolve. Usually starts with "How should we…" or "What must we do to…"</div><textarea id="q-kq" rows="2" placeholder="e.g. How should Meridian Logistics modernise its technology platform to retain enterprise clients and restore competitive parity — and at what speed and investment level?"></textarea></div>
+        <div class="qg"><div class="ql"><span class="tg ta">A — Hypothesis</span></div><div class="qh">Your best current belief about the answer. A hypothesis — it will be stress-tested next.</div><textarea id="q-hyp" rows="2" placeholder="e.g. We should pursue a phased cloud migration over 18 months, partnering with a strategic technology vendor rather than building in-house, prioritising the client-facing tracking platform first."></textarea></div>
+        <div class="qg" style="margin-bottom:0"><div class="ql"><span class="tg tm">MECE</span> What are the 2–4 realistic strategic options?</div><div class="qh">Mutually exclusive — no overlap. Collectively exhaustive — no gaps. Claude will stress-test these next.</div><textarea id="q-opts" rows="4" placeholder="Option 1: Build in-house — full control, slow, expensive&#10;Option 2: Acquire a tech company — fast, high cost, integration risk&#10;Option 3: Partner with a platform vendor — moderate cost, shared risk&#10;Option 4: Outsource entirely — lowest capex, least differentiation"></textarea></div>
+      </div>
+      <div class="nr"><button class="btn" onclick="scBack(3)">← Back</button><button class="btn bp" onclick="scNext(3)">Continue →</button></div>
+    </div>
+    <!-- Step 4: MECE -->
+    <div id="sc4" style="display:none">
+      <div class="st"><div class="ey">Phase 1 · Step 4 of 4 · MECE Stress-Test</div><div class="ttl">Are your options airtight?</div><div class="sub">Claude is reviewing your options for MECE compliance — mutually exclusive, collectively exhaustive.</div></div>
+      <div class="pb"><div class="pbf" style="width:100%"></div></div>
+      <div class="fa">
+        <div class="mp" id="mece-panel">
+          <div class="mh"><div class="mt2">MECE analysis</div><div class="ms warn" id="mece-badge">Checking…</div></div>
+          <div class="mb" id="mece-body"><div class="mi"><div class="gic ac" style="width:14px;height:14px;font-size:8px">…</div><span style="color:var(--ink3)">Reviewing your options...</span></div></div>
+        </div>
+        <div class="qg" style="margin-top:16px;margin-bottom:0"><div class="ql">Refine your options based on the analysis above?</div><div class="qh">Optional — leave blank to proceed with your original options.</div><textarea id="q-opts2" rows="3" placeholder="Update your options here if needed..."></textarea></div>
+      </div>
+      <div class="nr"><button class="btn" onclick="scBack(4)">← Back</button><button class="btn bg" onclick="goHandoff()">Review problem summary →</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ HANDOFF ══════════════════ -->
+<div id="s-handoff" class="screen">
+  <div class="id-bar">
+    <div class="wm">Strategy<span>Brief</span></div>
+    <div class="phase-track"><div class="pt"><div class="pd done"></div><span>Problem</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd active"></div><span>Brief</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd"></div><span>Deck</span></div></div>
+  </div>
+  <div class="card">
+    <div class="hh">
+      <div class="hi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="var(--a)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="ht">Your problem is structured.</div>
+      <div class="hs">Review your SCQA summary — this becomes the intellectual backbone of your strategy brief. The "so what" logic that makes it consulting-grade.</div>
+    </div>
+    <div class="hcg" id="handoff-grid"></div>
+    <div style="margin:0 30px 22px;padding:13px 15px;border-radius:var(--rs);background:var(--al);border:1px solid rgba(26,58,92,.14)"><div style="font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--a);margin-bottom:4px">Phase 2 uses this</div><div style="font-size:12px;color:var(--ink2);line-height:1.6">Your SCQA pre-populates the strategy brief — questions become smarter because the core tension is already defined. Claude will then synthesise everything into a 7-slide deck.</div></div>
+    <div class="nr"><button class="btn" onclick="goTo('s-scqa')">← Edit problem</button><button class="btn bp" onclick="goP2()">Build the strategy brief →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════ PHASE 2 ══════════════════ -->
+<div id="s-p2" class="screen">
+  <div class="id-bar">
+    <div class="wm">Strategy<span>Brief</span></div>
+    <div class="phase-track"><div class="pt"><div class="pd done"></div><span>Problem</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd active"></div><span>Brief</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd"></div><span>Deck</span></div></div>
+  </div>
+  <div class="card">
+    <div id="ald-p2" class="ai-ld"><div class="spin"></div><div class="ai-ld-t">Generating your strategy brief...</div></div>
+    <!-- P2 Step 1 -->
+    <div id="p2s1">
+      <div class="st"><div class="ey">Phase 2 · Step 1 of 3 · Strategic ambition</div><div class="ttl">Where are you going?</div><div class="sub">Define the ambition that will anchor every strategic choice over the planning horizon.</div></div>
+      <div class="pb"><div class="pbf" style="width:33%"></div></div>
+      <div class="fa">
+        <div class="qg"><div style="font-size:12px;padding:9px 13px;background:var(--al);border-radius:var(--rs);color:var(--a);margin-bottom:13px;line-height:1.55"><strong>Your hypothesis:</strong> <span id="hyp-echo"></span></div></div>
+        <div class="qg"><div class="ql">North star — your ambition in one sentence</div><div class="qh">Bold, specific, time-bound. This becomes the headline of your brief.</div><textarea id="q-ns" rows="2" placeholder="e.g. Become the most technologically advanced logistics operator in ANZ by 2027, retaining 100% of enterprise clients and growing market share by 20%."></textarea></div>
+        <div class="qg"><div class="ql">Strategic time horizon</div><div class="pr" id="pr-hor"><span class="pi" onclick="tp(this,'hor')">1 year</span><span class="pi on" onclick="tp(this,'hor')">3 years</span><span class="pi" onclick="tp(this,'hor')">5 years</span></div></div>
+        <div class="qg" style="margin-bottom:0"><div class="ql">What does winning look like? (2–3 measurable outcomes)</div><textarea id="q-out" rows="2" placeholder="e.g. Zero enterprise client churn by end of Year 1. Real-time tracking live for all clients by Q3 2025. EBITDA margin restored to 18%+ by Year 3."></textarea></div>
+      </div>
+      <div class="nr"><button class="btn" onclick="goTo('s-handoff')">← Back</button><button class="btn bp" onclick="p2Next(1)">Continue →</button></div>
+    </div>
+    <!-- P2 Step 2 -->
+    <div id="p2s2" style="display:none">
+      <div class="st"><div class="ey">Phase 2 · Step 2 of 3 · Priorities &amp; capabilities</div><div class="ttl">How will you get there?</div><div class="sub">Name the big bets and the capabilities you must build. Your MECE options inform your choices.</div></div>
+      <div class="pb"><div class="pbf" style="width:66%"></div></div>
+      <div class="fa">
+        <div class="qg"><div class="ql">Top 3 strategic priorities</div><div class="qh">Specific and actionable — not just themes.</div><textarea id="q-pri" rows="4" placeholder="1. Migrate client-facing platform to cloud (Azure partnership) within 12 months&#10;2. Launch real-time tracking product as premium tier by Q2 2025&#10;3. Establish Digital & Data Centre of Excellence with 25 specialist hires"></textarea></div>
+        <div class="qg"><div class="ql">Capabilities to build or acquire</div><textarea id="q-cap" rows="2" placeholder="e.g. Cloud architecture, real-time data engineering, product management, enterprise sales for tech-forward positioning"></textarea></div>
+        <div class="qg" style="margin-bottom:0"><div class="ql">Primary risk to execution</div><textarea id="q-risk" rows="2" placeholder="e.g. Speed — if the platform migration takes longer than 18 months, we risk further enterprise client losses before the new product is live."></textarea></div>
+      </div>
+      <div class="nr"><button class="btn" onclick="p2Back(2)">← Back</button><button class="btn bp" onclick="p2Next(2)">Continue →</button></div>
+    </div>
+    <!-- P2 Step 3 -->
+    <div id="p2s3" style="display:none">
+      <div class="st"><div class="ey">Phase 2 · Step 3 of 3 · Framing</div><div class="ttl">Final details.</div><div class="sub">Shape the consulting framework and tone of your brief.</div></div>
+      <div class="pb"><div class="pbf" style="width:100%"></div></div>
+      <div class="fa">
+        <div class="qg"><div class="ql">Consulting framework</div><div class="pr" id="pr-fw"><span class="pi on" onclick="tp(this,'fw')">3 Horizons</span><span class="pi" onclick="tp(this,'fw')">Where to Play / How to Win</span><span class="pi" onclick="tp(this,'fw')">Jobs to Be Done</span><span class="pi" onclick="tp(this,'fw')">Blue Ocean</span></div></div>
+        <div class="qg"><div class="ql">Tone</div><div class="pr" id="pr-tn"><span class="pi on" onclick="tp(this,'tn')">Authoritative &amp; direct</span><span class="pi" onclick="tp(this,'tn')">Collaborative &amp; inclusive</span><span class="pi" onclick="tp(this,'tn')">Urgent &amp; action-oriented</span><span class="pi" onclick="tp(this,'tn')">Analytical &amp; evidence-led</span></div></div>
+        <div class="qg" style="margin-bottom:0"><div class="ql">Additional context for Claude</div><textarea id="q-extra" rows="2" placeholder="e.g. We have a board meeting in 3 weeks. The CFO is sceptical about tech investment. Frame ROI carefully."></textarea></div>
+      </div>
+      <div class="nr"><button class="btn" onclick="p2Back(3)">← Back</button><button class="btn bg" onclick="genBrief()">Generate strategy brief →</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ GENERATING ══════════════════ -->
+<div id="s-gen" class="screen">
+  <div class="id-bar"><div class="wm">Strategy<span>Brief</span></div></div>
+  <div class="card">
+    <div class="gw">
+      <div class="gt">Building your strategy brief</div>
+      <div class="gsb">Claude is applying consulting frameworks to your structured problem</div>
+      <div class="gl2">
+        <div class="gi2"><div class="gic" id="gi0">1</div><span>Synthesising SCQA problem structure</span></div>
+        <div class="gi2"><div class="gic" id="gi1">2</div><span>Framing executive narrative arc</span></div>
+        <div class="gi2"><div class="gic" id="gi2">3</div><span>Structuring priorities (MECE)</span></div>
+        <div class="gi2"><div class="gic" id="gi3">4</div><span>Building capability &amp; roadmap slides</span></div>
+        <div class="gi2"><div class="gic" id="gi4">5</div><span>Formatting consulting-grade deck</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ OUTPUT — PHASE 2 ══════════════════ -->
+<div id="s-out" class="screen">
+  <div class="id-bar">
+    <div class="wm">Strategy<span>Brief</span></div>
+    <div class="phase-track"><div class="pt"><div class="pd done"></div><span>Problem</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd done"></div><span>Brief</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd active"></div><span>Deck</span></div></div>
+  </div>
+  <div class="card">
+    <div class="oh">
+      <div><div class="ot" id="out-ttl">Strategy Brief</div><div class="om" id="out-meta"></div></div>
+      <div class="br">
+        <button class="btn" onclick="goTo('s-p2')">← Edit</button>
+        <button class="btn bp" onclick="goToP3()" style="white-space:nowrap">Build visual deck →</button>
+      </div>
+    </div>
+    <!-- Share row -->
+    <div style="padding:12px 26px;border-bottom:1px solid var(--bdr);background:var(--bg2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="font-size:12px;color:var(--ink2)">Share this brief with your team</div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <div class="share-input" id="share-url" style="min-width:180px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">Generating link…</div>
+          <button class="copy-btn" id="copy-btn" onclick="copyLink()">Copy link</button>
+        </div>
+      </div>
+    </div>
+    <div class="stabs" id="out-tabs"></div>
+    <div class="sp" id="out-pane"></div>
+    <div class="of">
+      <span class="ofn">StrategyBrief · SCQA · MECE · Pyramid Principle · Claude AI · Output is AI-assisted — validate before use</span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn" style="font-size:11px;padding:5px 12px;color:var(--ink3)" onclick="goTo('s-apikey')">Change API key</button>
+        <button class="btn" onclick="window.location.reload()">Start over</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PHASE 3 ══════════════════ -->
+<div id="s-p3" class="screen">
+  <div class="id-bar">
+    <div class="wm">Strategy<span>Brief</span></div>
+    <div class="phase-track"><div class="pt"><div class="pd done"></div><span>Problem</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd done"></div><span>Brief</span></div><div class="pt-sep">→</div><div class="pt"><div class="pd active"></div><span>Deck</span></div></div>
+  </div>
+  <div class="card">
+    <div class="st"><div class="ey">Phase 3 · Visual deck</div><div class="ttl">Make it boardroom-ready.</div><div class="sub">Choose your brand colours and export a polished PowerPoint deck — structured by your SCQA logic, designed for the room.</div></div>
+    <div class="fa">
+      <!-- Brand colours -->
+      <div class="qg">
+        <div class="ql">Brand colours</div>
+        <div class="qh">These flow through every slide — use your organisation's palette.</div>
+        <div class="brand-row">
+          <div class="swatch-wrap"><div class="swatch-label">Primary</div><input type="color" class="swatch-input" id="c-primary" value="#1a3a5c" oninput="updatePreviews()"/></div>
+          <div class="swatch-wrap"><div class="swatch-label">Secondary</div><input type="color" class="swatch-input" id="c-secondary" value="#2d6a4f" oninput="updatePreviews()"/></div>
+          <div class="swatch-wrap"><div class="swatch-label">Accent</div><input type="color" class="swatch-input" id="c-accent" value="#b5862a" oninput="updatePreviews()"/></div>
+          <div class="swatch-wrap"><div class="swatch-label">Background</div><input type="color" class="swatch-input" id="c-light" value="#f7f6f3" oninput="updatePreviews()"/></div>
+        </div>
+      </div>
+      <!-- Preset palettes -->
+      <div class="qg">
+        <div class="ql">Preset palettes</div>
+        <div class="pr" id="pr-palette">
+          <span class="pi on" onclick="setPalette(this,'1a3a5c','2d6a4f','b5862a','f7f6f3')">Navy &amp; gold</span>
+          <span class="pi" onclick="setPalette(this,'1E2761','185FA5','C8A951','F5F5F5')">Midnight blue</span>
+          <span class="pi" onclick="setPalette(this,'36454F','5C8374','C09B6B','F4F1EC')">Charcoal earth</span>
+          <span class="pi" onclick="setPalette(this,'6D2E46','A26769','D4A459','FAF6F0')">Berry &amp; cream</span>
+          <span class="pi" onclick="setPalette(this,'028090','065A82','EF9F27','F0F8FA')">Teal &amp; amber</span>
+          <span class="pi" onclick="setPalette(this,'212121','444444','E63946','F8F8F8')">Monochrome bold</span>
+        </div>
+      </div>
+      <!-- Slide preview -->
+      <div class="qg" style="margin-bottom:0">
+        <div class="ql">Slide preview</div>
+        <div class="deck-preview">
+          <div class="dp-top"><div class="dp-label">Deck overview — <span id="slide-count">7</span> content slides + title &amp; closing</div></div>
+          <div class="slide-grid-preview" id="slide-prev-grid"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Export -->
+    <div style="padding:0 30px 26px">
+      <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:10px">Export</div>
+      <div class="export-row">
+        <button class="export-btn primary" id="pptx-btn" onclick="exportPPTX()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download PPTX
+        </button>
+        <button class="export-btn" onclick="exportPDF()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2h-2M9 17H7m4-4H7m10-1v4a1 1 0 01-1 1H9a1 1 0 01-1-1v-4a1 1 0 011-1h6a1 1 0 011 1z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Export PDF (print)
+        </button>
+        <button class="export-btn" onclick="copyLink()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span id="share-btn-txt">Copy shareable link</span>
+        </button>
+      </div>
+      <div style="margin-top:14px;padding:11px 14px;border-radius:var(--rs);background:var(--bg2);border:1px solid var(--bdr);font-size:11px;color:var(--ink3);line-height:1.6">
+        <strong style="color:var(--ink2)">Disclaimer:</strong> The PPTX and shareable link contain your strategy inputs. Do not share outside your organisation if inputs contain sensitive or confidential information. AI-generated content should be reviewed by qualified professionals before use in any official capacity.
+      </div>
+    </div>
+    <div class="of" style="padding:12px 26px">
+      <span class="ofn">StrategyBrief · Phase 3 · PPTX generated in-browser via PptxGenJS · Claude AI</span>
+      <button class="btn" onclick="goTo('s-out')">← Back to brief</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── State ──────────────────────────────────────
+var S = {
+  org:'',audience:'',situation:'',complication:'',problemType:'',
+  keyQuestion:'',hypothesis:'',options:'',optionsRefined:'',
+  northStar:'',horizon:'3 years',outcomes:'',
+  priorities:'',capabilities:'',risk:'',
+  framework:'3 Horizons',tone:'Authoritative & direct',extra:'',
+  slides:[],
+  apiKey:''
+};
+
+// ── API key helpers ────────────────────────────
+function apiHeaders(){
+  var h={'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+  if(S.apiKey) h['x-api-key']=S.apiKey;
+  return h;
+}
+function updateKeyBtn(){
+  var val=document.getElementById('api-key-input').value.trim();
+  var err=document.getElementById('key-error');
+  var ok=val===''||val.startsWith('sk-ant-');
+  err.style.display=(val!==''&&!ok)?'block':'none';
+  document.getElementById('key-submit-btn').disabled=!val.startsWith('sk-ant-');
+}
+function toggleKeyVis(){
+  var inp=document.getElementById('api-key-input');
+  var btn=document.getElementById('key-vis-btn');
+  if(inp.type==='password'){inp.type='text';btn.textContent='Hide';}
+  else{inp.type='password';btn.textContent='Show';}
+}
+function submitApiKey(){
+  var val=document.getElementById('api-key-input').value.trim();
+  if(!val.startsWith('sk-ant-')) return;
+  S.apiKey=val;
+  goTo('s-welcome');
+}
+function skipApiKey(){
+  S.apiKey='';
+  goTo('s-welcome');
+}
+
+// ── Disclaimer ─────────────────────────────────
+function updateDisclaimerBtn(){
+  document.getElementById('disc-accept-btn').disabled = !document.getElementById('disc-chk').checked;
+}
+function acceptDisclaimer(){
+  document.getElementById('disc-modal').classList.remove('show');
+  goTo('s-apikey');
+}
+
+// ── Navigation ──────────────────────────────────
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='s-welcome') updateKeyBadge();
+}
+function updateKeyBadge(){
+  var badge=document.getElementById('key-status-badge');
+  if(!badge) return;
+  if(S.apiKey){
+    badge.textContent='API key connected ✓';
+    badge.style.background='var(--al2)';badge.style.color='var(--a2)';badge.style.border='1px solid rgba(45,106,79,.2)';
+    badge.title='Click to change key';badge.style.cursor='pointer';
+    badge.onclick=function(){ goTo('s-apikey'); };
+  } else {
+    badge.textContent='No API key — template output only';
+    badge.style.background='var(--gl)';badge.style.color='var(--gold)';badge.style.border='1px solid rgba(181,134,42,.2)';
+    badge.title='Click to add a key';badge.style.cursor='pointer';
+    badge.onclick=function(){ goTo('s-apikey'); };
+  }
+}
+
+// ── Pill toggle ────────────────────────────────
+function tp(el,g){
+  var single=['aud','pt','hor','fw','tn','palette'];
+  if(single.indexOf(g)>=0){
+    document.querySelectorAll('#pr-'+g+' .pi').forEach(p=>p.classList.remove('on'));
+    el.classList.add('on');
+  } else { el.classList.toggle('on'); }
+}
+function gs(g){
+  return Array.from(document.querySelectorAll('#pr-'+g+' .pi.on')).map(p=>p.textContent.trim()).join(', ');
+}
+
+// ── SCQA steps ─────────────────────────────────
+function scNext(step){
+  if(step===1){
+    S.situation=document.getElementById('q-sit').value;
+    S.org=document.getElementById('q-org').value||'Your Organisation';
+    S.audience=gs('aud')||'C-suite';
+    showEl('sc2'); hideEl('sc1');
+  } else if(step===2){
+    S.complication=document.getElementById('q-comp').value;
+    S.problemType=gs('pt')||'Capability gap';
+    showEl('sc3'); hideEl('sc2');
+  } else if(step===3){
+    S.keyQuestion=document.getElementById('q-kq').value;
+    S.hypothesis=document.getElementById('q-hyp').value;
+    S.options=document.getElementById('q-opts').value;
+    showEl('sc4'); hideEl('sc3');
+    runMece();
+  }
+  window.scrollTo(0,0);
+}
+function scBack(s){ hideEl('sc'+s); showEl('sc'+(s-1)); window.scrollTo(0,0); }
+function showEl(id){ document.getElementById(id).style.display='block'; }
+function hideEl(id){ document.getElementById(id).style.display='none'; }
+
+// ── MECE AI ────────────────────────────────────
+async function runMece(){
+  var badge=document.getElementById('mece-badge'), body=document.getElementById('mece-body');
+  badge.textContent='Checking…'; badge.className='ms warn';
+  body.innerHTML='<div class="mi"><div class="gic ac" style="width:14px;height:14px;font-size:8px">…</div><span style="color:var(--ink3)">Claude is reviewing your options…</span></div>';
+  var prompt='You are a McKinsey consultant. Review these strategic options for MECE compliance.\n\nProblem: '+S.keyQuestion+'\nOptions:\n'+S.options+'\n\nReturn ONLY valid JSON (no markdown): {"overall":"pass or warn","badge":"MECE compliant or Needs refinement","checks":[{"pass":true,"text":"..."}],"suggestion":"one sentence if warn, empty string if pass"}';
+  if(!S.apiKey){
+    badge.textContent='No API key'; badge.className='ms warn';
+    body.innerHTML='<div class="mi"><div class="mc f">!</div><span>Add an Anthropic API key on the setup screen to enable live MECE analysis. You can still proceed — the brief will use template output.</span></div>';
+    return;
+  }
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:apiHeaders(),body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})});
+    var d=await res.json();
+    var txt=d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    var p=JSON.parse(txt);
+    badge.textContent=p.badge; badge.className='ms '+(p.overall==='pass'?'ok':'warn');
+    body.innerHTML=p.checks.map(c=>'<div class="mi"><div class="mc '+(c.pass?'p':'f')+'">'+(c.pass?'✓':'!')+'</div><span>'+c.text+'</span></div>').join('')+(p.suggestion?'<div style="margin-top:9px;font-size:12px;color:var(--gold);padding-top:7px;border-top:1px solid var(--bdr)">'+p.suggestion+'</div>':'');
+  }catch(e){
+    badge.textContent='Review manually'; badge.className='ms warn';
+    body.innerHTML='<div class="mi"><div class="mc p">✓</div><span>Options appear differentiated and distinct</span></div><div class="mi"><div class="mc f">!</div><span>Consider whether all realistic strategic paths are covered</span></div><div class="mi"><div class="mc p">✓</div><span>No obvious overlaps detected between named options</span></div>';
+  }
+}
+
+// ── Handoff ────────────────────────────────────
+function goHandoff(){
+  S.optionsRefined=document.getElementById('q-opts2').value;
+  var items=[
+    {l:'Situation',v:S.situation||'—'},
+    {l:'Complication',v:S.complication||'—'},
+    {l:'Key question',v:S.keyQuestion||'—'},
+    {l:'Hypothesis',v:S.hypothesis||'—'},
+    {l:'Options (MECE)',v:S.optionsRefined||S.options||'—'},
+    {l:'Organisation · Audience',v:S.org+' · '+S.audience}
+  ];
+  document.getElementById('handoff-grid').innerHTML=items.map(i=>'<div class="hc"><div class="hcl">'+i.l+'</div><div class="hcv">'+i.v+'</div></div>').join('');
+  goTo('s-handoff');
+}
+
+// ── Phase 2 ────────────────────────────────────
+function goP2(){
+  document.getElementById('hyp-echo').textContent=S.hypothesis||'Your hypothesis from Phase 1.';
+  goTo('s-p2');
+}
+function p2Next(s){
+  if(s===1){
+    S.northStar=document.getElementById('q-ns').value;
+    S.horizon=gs('hor')||'3 years';
+    S.outcomes=document.getElementById('q-out').value;
+    hideEl('p2s1'); showEl('p2s2');
+  } else if(s===2){
+    S.priorities=document.getElementById('q-pri').value;
+    S.capabilities=document.getElementById('q-cap').value;
+    S.risk=document.getElementById('q-risk').value;
+    hideEl('p2s2'); showEl('p2s3');
+  }
+  window.scrollTo(0,0);
+}
+function p2Back(s){ hideEl('p2s'+s); showEl('p2s'+(s-1)); window.scrollTo(0,0); }
+
+// ── Generate Brief ─────────────────────────────
+async function genBrief(){
+  S.framework=gs('fw')||'3 Horizons';
+  S.tone=gs('tn')||'Authoritative & direct';
+  S.extra=document.getElementById('q-extra').value;
+  goTo('s-gen'); animGen();
+  if(!S.apiKey){
+    setTimeout(function(){ S.slides=fallbackSlides(); buildOutput(); goTo('s-out'); },3500);
+    return;
+  }
+  var prompt='You are a senior McKinsey strategy consultant. Generate a board-ready 7-slide strategy brief.\n\nSCQA STRUCTURE:\n- Organisation: '+S.org+'\n- Audience: '+S.audience+'\n- Situation: '+S.situation+'\n- Complication: '+S.complication+'\n- Problem type: '+S.problemType+'\n- Key question: '+S.keyQuestion+'\n- Hypothesis: '+S.hypothesis+'\n- Options (MECE): '+(S.optionsRefined||S.options)+'\n\nSTRATEGIC INPUTS:\n- North star: '+S.northStar+'\n- Horizon: '+S.horizon+'\n- Outcomes: '+S.outcomes+'\n- Priorities: '+S.priorities+'\n- Capabilities: '+S.capabilities+'\n- Risk: '+S.risk+'\n- Framework: '+S.framework+'\n- Tone: '+S.tone+'\n- Context: '+S.extra+'\n\nReturn ONLY a JSON array (no markdown) of exactly 7 slide objects:\n[\n  {"tab":"01 · Executive summary","eyebrow":"Executive summary","heading":"...","lead":"2-3 sentence so-what","type":"summary","bullets":["...","...","..."]},\n  {"tab":"02 · The situation","eyebrow":"Situation & complication","heading":"...","lead":"...","type":"scqa","situation":"...","complication":"...","question":"...","hypothesis":"..."},\n  {"tab":"03 · Strategic ambition","eyebrow":"Strategic ambition","heading":"...","lead":"...","type":"ambition","northstar":"...","outcomes":["...","...","..."]},\n  {"tab":"04 · Strategic options","eyebrow":"Strategic options","heading":"...","lead":"...","type":"options","options":[{"label":"...","desc":"...","verdict":"recommended or viable or not recommended"}]},\n  {"tab":"05 · Strategic priorities","eyebrow":"Strategic priorities","heading":"...","lead":"...","type":"priorities","priorities":[{"num":"01","title":"...","desc":"...","timeframe":"..."}]},\n  {"tab":"06 · Capability agenda","eyebrow":"Capability agenda","heading":"...","lead":"...","type":"capabilities","capabilities":[{"name":"...","action":"Build or Acquire or Partner","urgency":75}]},\n  {"tab":"07 · Roadmap","eyebrow":"Execution roadmap","heading":"...","lead":"...","type":"roadmap","horizons":[{"badge":"H1 · Year 1","badgeClass":"h1c","title":"...","desc":"..."},{"badge":"H2 · Year 2","badgeClass":"h2c","title":"...","desc":"..."},{"badge":"H3 · '+S.horizon+'","badgeClass":"h3c","title":"...","desc":"..."}],"risk":"..."}\n]\n\nMake content specific and insightful using '+S.framework+' framework logic and '+S.tone+' tone.';
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:apiHeaders(),body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})});
+    var d=await res.json();
+    var txt=d.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    S.slides=JSON.parse(txt);
+  }catch(e){ S.slides=fallbackSlides(); }
+  buildOutput();
+  goTo('s-out');
+}
+
+function animGen(){
+  [0,1,2,3,4].forEach(function(i){
+    var el=document.getElementById('gi'+i);
+    if(el){el.className='gic';el.textContent=(i+1);}
+  });
+  var delay=0;
+  [0,1,2,3,4].forEach(function(i){
+    setTimeout(function(){
+      if(i>0){var p=document.getElementById('gi'+(i-1));if(p){p.className='gic dn';p.textContent='✓';}}
+      var c=document.getElementById('gi'+i);if(c){c.className='gic ac';c.textContent='›';}
+    },delay+=800);
+  });
+}
+
+// ── Build output ────────────────────────────────
+function buildOutput(){
+  document.getElementById('out-ttl').textContent=S.org+' — Strategy Brief';
+  document.getElementById('out-meta').textContent=S.horizon+' horizon · '+S.audience+' · '+S.slides.length+' slides · '+S.framework;
+  var tabs=document.getElementById('out-tabs');
+  tabs.innerHTML=S.slides.map((s,i)=>'<div class="stab'+(i===0?' active':'')+'" onclick="sw('+i+')">'+s.tab+'</div>').join('');
+  renderSlide(0);
+  buildShareLink();
+  buildSlideGrid();
+}
+
+var cur=0;
+function sw(i){ cur=i; document.querySelectorAll('.stab').forEach((t,j)=>t.classList.toggle('active',j===i)); renderSlide(i); }
+
+function renderSlide(i){
+  var s=S.slides[i]; if(!s) return;
+  var h='<div class="sey">'+s.eyebrow+'</div><div class="sh">'+s.heading+'</div><div class="sl">'+s.lead+'</div>';
+  if(s.type==='summary'){
+    h+='<div style="display:flex;flex-direction:column;gap:7px">';
+    (s.bullets||[]).forEach(b=>{h+='<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 13px;background:var(--bg2);border-radius:var(--rs);border:1px solid var(--bdr)"><div style="width:6px;height:6px;border-radius:50%;background:var(--a);flex-shrink:0;margin-top:5px"></div><span style="font-size:13px;color:var(--ink);line-height:1.55">'+b+'</span></div>';});
+    h+='</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px"><div class="ic2"><div class="icl">Organisation</div><div class="icv">'+S.org+'</div></div><div class="ic2"><div class="icl">Audience</div><div class="icv">'+S.audience+'</div></div></div>';
+  }
+  if(s.type==='scqa'){
+    [['Situation','ts',s.situation||''],['Complication','tc',s.complication||''],['Question','tq',s.question||''],['Hypothesis','ta',s.hypothesis||'']].forEach(function(x){
+      h+='<div class="scqa-card" style="border-left-color:'+(x[1]==='ts'?'var(--a)':x[1]==='tc'?'#8b2318':x[1]==='tq'?'var(--gold)':'var(--a2)')+'"><div class="scqa-tag"><span class="tg '+x[1]+'">'+x[0]+'</span></div><div class="scqa-txt" style="margin-top:5px">'+x[2]+'</div></div>';
+    });
+  }
+  if(s.type==='ambition'){
+    h+='<div style="border-left:3px solid var(--a);padding:13px 17px;background:var(--al);border-radius:0 var(--rs) var(--rs) 0;margin-bottom:13px"><div style="font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--a);margin-bottom:4px">North star</div><div style="font-family:var(--serif);font-size:15px;color:var(--ink);line-height:1.45">'+( s.northstar||'')+'</div></div>';
+    h+='<div style="font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px">Definition of winning</div><div style="display:flex;flex-direction:column;gap:6px">';
+    (s.outcomes||[]).forEach(o=>{h+='<div style="display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink)"><div style="width:6px;height:6px;border-radius:50%;background:var(--a2);flex-shrink:0"></div>'+o+'</div>';});
+    h+='</div>';
+  }
+  if(s.type==='options'){
+    var vCfg={recommended:{bg:'var(--al2)',bdr:'var(--a2)',lbl:'Recommended',tc:'var(--a2)'},viable:{bg:'var(--bg2)',bdr:'var(--bdr)',lbl:'Viable',tc:'var(--ink3)'},'not recommended':{bg:'#fdf4f3',bdr:'#f5c6c4',lbl:'Not recommended',tc:'#8b2318'}};
+    h+='<div style="display:flex;flex-direction:column;gap:8px">';
+    (s.options||[]).forEach(o=>{var v=(o.verdict||'viable').toLowerCase();var c=vCfg[v]||vCfg.viable;h+='<div style="border:1px solid '+c.bdr+';border-radius:var(--rs);padding:12px 15px;background:'+c.bg+';display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div><div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px">'+o.label+'</div><div style="font-size:12px;color:var(--ink3);line-height:1.5">'+o.desc+'</div></div><div style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:'+c.bg+';color:'+c.tc+';border:1px solid '+c.bdr+';white-space:nowrap;flex-shrink:0">'+c.lbl+'</div></div>';});
+    h+='</div>';
+  }
+  if(s.type==='priorities'){
+    h+='<div class="pri-list">';
+    (s.priorities||[]).forEach((p,i)=>{h+='<div class="pri-item"><div class="pri-n">0'+(i+1)+'</div><div><div class="pt2">'+p.title+'</div><div class="pd2">'+p.desc+'</div></div><div style="font-size:11px;color:var(--ink3);flex-shrink:0;padding-top:2px">'+( p.timeframe||'')+'</div></div>';});
+    h+='</div>';
+  }
+  if(s.type==='capabilities'){
+    h+='<div class="bar-stack">';
+    (s.capabilities||[]).forEach(c=>{var pct=Math.min(100,Math.max(10,parseInt(c.urgency)||70));h+='<div><div class="bar-top">'+c.name+'<span>'+( c.action||'Build')+'</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%"></div></div></div>';});
+    h+='</div>';
+  }
+  if(s.type==='roadmap'){
+    h+='<div class="h-row">';
+    (s.horizons||[]).forEach(hz=>{h+='<div class="h-item"><div class="h-bdg '+(hz.badgeClass||'h1c')+'">'+hz.badge+'</div><div><div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:2px">'+hz.title+'</div><div style="font-size:12px;color:var(--ink3);line-height:1.5">'+hz.desc+'</div></div></div>';});
+    h+='</div>';
+    if(s.risk) h+='<div class="risk-p"><div class="risk-l">Primary execution risk</div><div class="risk-t">'+s.risk+'</div></div>';
+  }
+  document.getElementById('out-pane').innerHTML=h;
+}
+
+// ── Share link ─────────────────────────────────
+function buildShareLink(){
+  try{
+    var data=btoa(unescape(encodeURIComponent(JSON.stringify({org:S.org,audience:S.audience,horizon:S.horizon,framework:S.framework,slides:S.slides}))));
+    var url=window.location.href.split('?')[0]+'?brief='+data;
+    document.getElementById('share-url').textContent=url;
+    document.getElementById('share-url').title=url;
+  }catch(e){ document.getElementById('share-url').textContent='Link unavailable (data too large)'; }
+}
+function copyLink(){
+  var url=document.getElementById('share-url').textContent;
+  if(url==='Link unavailable (data too large)') return;
+  navigator.clipboard.writeText(url).then(function(){
+    var btn=document.getElementById('copy-btn'), sbtn=document.getElementById('share-btn-txt');
+    btn.textContent='Copied!'; btn.className='copy-btn copied';
+    if(sbtn) sbtn.textContent='Link copied!';
+    setTimeout(function(){ btn.textContent='Copy link'; btn.className='copy-btn'; if(sbtn) sbtn.textContent='Copy shareable link'; },2500);
+  }).catch(function(){
+    prompt('Copy this link:',url);
+  });
+}
+
+// Load from share link on page load
+function loadFromLink(){
+  var params=new URLSearchParams(window.location.search);
+  var brief=params.get('brief');
+  if(!brief) return false;
+  try{
+    var d=JSON.parse(decodeURIComponent(escape(atob(brief))));
+    S.org=d.org||'';S.audience=d.audience||'';S.horizon=d.horizon||'3 years';S.framework=d.framework||'3 Horizons';S.slides=d.slides||[];
+    if(S.slides.length>0){
+      buildOutput();
+      document.getElementById('disc-modal').classList.remove('show');
+      goTo('s-out');
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// ── Phase 3 init ───────────────────────────────
+function goToP3(){
+  buildSlideGrid();
+  goTo('s-p3');
+}
+
+// ── Phase 3 — Slide preview grid ───────────────
+function buildSlideGrid(){
+  var p=document.getElementById('slide-prev-grid');
+  var primary=document.getElementById('c-primary').value;
+  var accent=document.getElementById('c-accent').value;
+  if(!p) return;
+  document.getElementById('slide-count').textContent=S.slides.length;
+  p.innerHTML=S.slides.map((s,i)=>'<div class="sgp'+(i===0?' sel':'')+'" onclick="selSlide(this,'+i+')" id="sgp-'+i+'"><div class="sgp-head" style="background:'+primary+'">'+String(i+1).padStart(2,'0')+'</div><div class="sgp-body"><div class="sgp-line" style="width:90%;background:'+accent+';opacity:.4"></div><div class="sgp-line" style="width:70%"></div><div class="sgp-line" style="width:80%"></div></div></div>').join('');
+}
+function selSlide(el,i){ document.querySelectorAll('.sgp').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); }
+function updatePreviews(){ buildSlideGrid(); }
+function setPalette(el,p,s,a,l){
+  tp(el,'palette');
+  document.getElementById('c-primary').value='#'+p;
+  document.getElementById('c-secondary').value='#'+s;
+  document.getElementById('c-accent').value='#'+a;
+  document.getElementById('c-light').value='#'+l;
+  updatePreviews();
+}
+
+// ── PPTX Export ────────────────────────────────
+async function exportPPTX(){
+  var btn=document.getElementById('pptx-btn');
+  btn.disabled=true; btn.innerHTML='<div class="spin" style="width:14px;height:14px;border-width:1.5px"></div> Building…';
+  try{
+    var primary=document.getElementById('c-primary').value.replace('#','');
+    var secondary=document.getElementById('c-secondary').value.replace('#','');
+    var accent=document.getElementById('c-accent').value.replace('#','');
+    var light=document.getElementById('c-light').value.replace('#','');
+    var pres=new PptxGenJS();
+    pres.layout='LAYOUT_16x9';
+    pres.title=S.org+' — Strategy Brief';
+    var W=10,H=5.625;
+    function ms(){return{type:"outer",color:"000000",blur:8,offset:3,angle:135,opacity:0.1};}
+    // Title slide
+    var ts=pres.addSlide();
+    ts.background={color:primary};
+    ts.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.18,h:H,fill:{color:accent},line:{color:accent}});
+    ts.addText(S.org.toUpperCase(),{x:.45,y:1.35,w:9,h:.35,fontSize:10,color:"FFFFFF",charSpacing:4,transparency:38});
+    ts.addText("Strategy Brief",{x:.45,y:1.7,w:8.5,h:1.1,fontSize:46,color:"FFFFFF",bold:true,fontFace:"Georgia"});
+    ts.addText(S.horizon+' horizon  ·  '+S.audience,{x:.45,y:3.0,w:7,h:.38,fontSize:13,color:"FFFFFF",transparency:42});
+    var mn=new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+    ts.addText(mn,{x:.45,y:H-.35,w:4,h:.3,fontSize:9,color:"FFFFFF",transparency:52});
+    ts.addText('CONFIDENTIAL',{x:7.5,y:H-.35,w:2.3,h:.3,fontSize:9,color:"FFFFFF",transparency:52,align:'right',charSpacing:2});
+    // Content slides
+    S.slides.forEach(function(s,idx){
+      var sl=pres.addSlide();
+      sl.background={color:light};
+      sl.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:.52,fill:{color:primary},line:{color:primary}});
+      sl.addText((s.eyebrow||'').toUpperCase(),{x:.4,y:.08,w:8.5,h:.36,fontSize:9,color:"FFFFFF",charSpacing:3,transparency:28});
+      sl.addText(String(idx+1).padStart(2,'0'),{x:9.2,y:.08,w:.7,h:.36,fontSize:10,color:"FFFFFF",align:'right',transparency:48});
+      sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:.7,w:.07,h:.72,fill:{color:accent},line:{color:accent}});
+      sl.addText(s.heading||'',{x:.65,y:.68,w:8.8,h:.78,fontSize:21,color:primary,bold:true,fontFace:"Georgia",valign:'middle',margin:0});
+      sl.addText(s.lead||'',{x:.45,y:1.55,w:9.1,h:.52,fontSize:11,color:"555555",lineSpacingMultiple:1.3});
+      var cy=2.16, ch=H-cy-.32;
+      if(s.type==='summary'){
+        (s.bullets||[]).slice(0,3).forEach(function(b,i){
+          var by=cy+i*(ch/3);
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:by,w:9.1,h:ch/3-.09,fill:{color:"FFFFFF"},line:{color:"E0DDD8",width:.5},shadow:ms()});
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:by,w:.07,h:ch/3-.09,fill:{color:primary},line:{color:primary}});
+          sl.addText(b,{x:.65,y:by+.06,w:8.8,h:ch/3-.18,fontSize:11,color:"222222",valign:'middle'});
+        });
+      }
+      if(s.type==='scqa'){
+        var items=[{l:'S — Situation',t:s.situation||'',c:primary},{l:'C — Complication',t:s.complication||'',c:'A0311F'},{l:'Q — Key question',t:s.question||'',c:accent},{l:'A — Hypothesis',t:s.hypothesis||'',c:secondary}];
+        var bh=ch/2-.07;
+        items.forEach(function(it,i){
+          var col=i%2,row=Math.floor(i/2),bx=.45+col*4.65,by=cy+row*(bh+.1);
+          sl.addShape(pres.shapes.RECTANGLE,{x:bx,y:by,w:4.55,h:bh,fill:{color:"FFFFFF"},line:{color:"E0DDD8",width:.5},shadow:ms()});
+          sl.addShape(pres.shapes.RECTANGLE,{x:bx,y:by,w:4.55,h:.27,fill:{color:it.c},line:{color:it.c}});
+          sl.addText(it.l,{x:bx+.12,y:by+.03,w:4.3,h:.21,fontSize:9,color:"FFFFFF",bold:true,charSpacing:1});
+          sl.addText(it.t,{x:bx+.12,y:by+.32,w:4.3,h:bh-.38,fontSize:10,color:"333333",lineSpacingMultiple:1.3});
+        });
+      }
+      if(s.type==='ambition'){
+        sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:cy,w:9.1,h:1.0,fill:{color:primary},line:{color:primary},shadow:ms()});
+        sl.addText('NORTH STAR',{x:.65,y:cy+.07,w:3,h:.2,fontSize:8,color:"FFFFFF",charSpacing:3,transparency:38});
+        sl.addText(s.northstar||'',{x:.65,y:cy+.27,w:8.7,h:.65,fontSize:13,color:"FFFFFF",bold:true,fontFace:"Georgia",lineSpacingMultiple:1.3});
+        (s.outcomes||[]).slice(0,3).forEach(function(o,i){
+          var oy=cy+1.1+i*.64;
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:oy,w:9.1,h:.56,fill:{color:"FFFFFF"},line:{color:"E0DDD8",width:.5}});
+          sl.addShape(pres.shapes.OVAL,{x:.58,y:oy+.16,w:.24,h:.24,fill:{color:secondary},line:{color:secondary}});
+          sl.addText(o,{x:1.0,y:oy+.1,w:8.3,h:.36,fontSize:11,color:"222222",valign:'middle'});
+        });
+      }
+      if(s.type==='options'){
+        var opts=(s.options||[]).slice(0,4),bw=9.1/opts.length-.1;
+        opts.forEach(function(o,i){
+          var v=(o.verdict||'viable').toLowerCase();
+          var bgC=v==='recommended'?'EBF5EE':v==='not recommended'?'FBEAEA':'FFFFFF';
+          var topC=v==='recommended'?secondary:v==='not recommended'?'A0311F':'888888';
+          var bx=.45+i*(bw+.1);
+          sl.addShape(pres.shapes.RECTANGLE,{x:bx,y:cy,w:bw,h:ch,fill:{color:bgC},line:{color:"E0DDD8",width:.5},shadow:ms()});
+          sl.addShape(pres.shapes.RECTANGLE,{x:bx,y:cy,w:bw,h:.3,fill:{color:topC},line:{color:topC}});
+          var vl=v==='recommended'?'RECOMMENDED':v==='not recommended'?'NOT REC.':'VIABLE';
+          sl.addText(vl,{x:bx+.08,y:cy+.04,w:bw-.16,h:.22,fontSize:8,color:"FFFFFF",charSpacing:1,align:'center',bold:true});
+          sl.addText(o.label||'',{x:bx+.1,y:cy+.38,w:bw-.18,h:.42,fontSize:12,color:"111111",bold:true,fontFace:"Georgia"});
+          sl.addText(o.desc||'',{x:bx+.1,y:cy+.85,w:bw-.18,h:ch-.92,fontSize:9.5,color:"444444",lineSpacingMultiple:1.3});
+        });
+      }
+      if(s.type==='priorities'){
+        (s.priorities||[]).slice(0,3).forEach(function(p,i){
+          var rh=ch/3-.07,py=cy+i*(ch/3);
+          var rc=[primary,secondary,accent][i];
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:py,w:9.1,h:rh,fill:{color:"FFFFFF"},line:{color:"E0DDD8",width:.5},shadow:ms()});
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:py,w:.72,h:rh,fill:{color:rc},line:{color:rc}});
+          sl.addText('0'+(i+1),{x:.45,y:py+rh/2-.2,w:.72,h:.4,fontSize:18,color:"FFFFFF",bold:true,fontFace:"Georgia",align:'center'});
+          sl.addText(p.title||'',{x:1.28,y:py+.1,w:6.5,h:.36,fontSize:12,color:primary,bold:true});
+          sl.addText(p.desc||'',{x:1.28,y:py+.46,w:6.5,h:rh-.54,fontSize:10,color:"555555",lineSpacingMultiple:1.3});
+          sl.addText(p.timeframe||'',{x:7.9,y:py+.1,w:1.5,h:.32,fontSize:10,color:"888888",align:'right'});
+        });
+      }
+      if(s.type==='capabilities'){
+        var caps=(s.capabilities||[]).slice(0,5),rh2=ch/caps.length-.07;
+        caps.forEach(function(c,i){
+          var cy2=cy+i*(ch/caps.length),pct=Math.min(100,Math.max(10,parseInt(c.urgency)||70));
+          sl.addText(c.name||'',{x:.45,y:cy2+rh2*.1,w:3.2,h:rh2*.5,fontSize:12,color:primary,bold:true,valign:'middle'});
+          sl.addText(c.action||'Build',{x:.45,y:cy2+rh2*.58,w:2,h:rh2*.38,fontSize:9,color:"888888"});
+          sl.addShape(pres.shapes.RECTANGLE,{x:3.8,y:cy2+rh2*.35,w:5.6,h:.17,fill:{color:"E0DDD8"},line:{color:"E0DDD8"}});
+          sl.addShape(pres.shapes.RECTANGLE,{x:3.8,y:cy2+rh2*.35,w:5.6*pct/100,h:.17,fill:{color:primary},line:{color:primary}});
+        });
+      }
+      if(s.type==='roadmap'){
+        var hc2=[primary,secondary,accent];
+        (s.horizons||[]).slice(0,3).forEach(function(hz,i){
+          var rh3=ch/3-.07,hy=cy+i*(ch/3);
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:hy,w:9.1,h:rh3,fill:{color:"FFFFFF"},line:{color:"E0DDD8",width:.5},shadow:ms()});
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:hy,w:1.65,h:rh3,fill:{color:hc2[i]},line:{color:hc2[i]}});
+          sl.addText(hz.badge||('H'+(i+1)),{x:.45,y:hy+rh3/2-.18,w:1.65,h:.36,fontSize:10,color:"FFFFFF",align:'center',bold:true});
+          sl.addText(hz.title||'',{x:2.25,y:hy+.1,w:7.1,h:.34,fontSize:12,color:primary,bold:true});
+          sl.addText(hz.desc||'',{x:2.25,y:hy+.45,w:7.1,h:rh3-.52,fontSize:10,color:"555555",lineSpacingMultiple:1.25});
+        });
+        if(s.risk){
+          var ry2=H-.52;
+          sl.addShape(pres.shapes.RECTANGLE,{x:.45,y:ry2,w:9.1,h:.26,fill:{color:'FBEAEA'},line:{color:'F5C6C4',width:.5}});
+          sl.addText('Risk: '+s.risk,{x:.6,y:ry2+.03,w:8.8,h:.2,fontSize:9,color:'A0311F'});
+        }
+      }
+      sl.addShape(pres.shapes.RECTANGLE,{x:0,y:H-.26,w:W,h:.26,fill:{color:"ECEAE6"},line:{color:"ECEAE6"}});
+      sl.addText(S.org+' · Strategy Brief · Confidential',{x:.45,y:H-.24,w:7,h:.2,fontSize:8,color:"888888"});
+      sl.addText((idx+1)+' / '+S.slides.length,{x:9.3,y:H-.24,w:.6,h:.2,fontSize:8,color:"888888",align:'right'});
+    });
+    // Closing
+    var cl=pres.addSlide();
+    cl.background={color:primary};
+    cl.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:.18,h:H,fill:{color:accent},line:{color:accent}});
+    cl.addText('Next steps',{x:.45,y:1.6,w:8,h:.45,fontSize:13,color:"FFFFFF",transparency:42,charSpacing:2});
+    cl.addText('Move from strategy to action.',{x:.45,y:2.05,w:8.5,h:1.0,fontSize:36,color:"FFFFFF",bold:true,fontFace:"Georgia"});
+    cl.addText(S.org,{x:.45,y:H-.35,w:6,h:.28,fontSize:10,color:"FFFFFF",transparency:52});
+    cl.addText('CONFIDENTIAL',{x:7.5,y:H-.35,w:2.3,h:.28,fontSize:9,color:"FFFFFF",transparency:52,align:'right',charSpacing:2});
+    await pres.writeFile({fileName:(S.org||'Strategy')+' Strategy Brief.pptx'});
+  }catch(err){
+    alert('Export failed: '+err.message);
+  }
+  btn.disabled=false; btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Download PPTX';
+}
+
+// ── PDF Export ─────────────────────────────────
+function exportPDF(){
+  var w=window.open('','_blank');
+  if(!w){ alert('Please allow pop-ups for this page to export PDF, then try again.'); return; }
+  w.document.write('<html lang="en-AU"><head><title>'+S.org+' Strategy Brief</title><style>body{margin:0;font-family:Georgia,serif;background:#fff}@page{size:A4 landscape;margin:0}.slide{width:297mm;height:210mm;page-break-after:always;display:flex;flex-direction:column;position:relative;overflow:hidden;background:#f7f6f3}.top-bar{background:#1a3a5c;padding:8px 24px;display:flex;justify-content:space-between;align-items:center;color:#fff}.ey{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;font-family:sans-serif}.sn{font-size:10px;opacity:.6;font-family:sans-serif}.body{padding:18px 28px 14px;flex:1}.acl{border-left:4px solid #b5862a;padding:0 0 0 12px;margin-bottom:10px}.h{font-size:22px;font-weight:bold;color:#1a3a5c;line-height:1.25;margin:0 0 4px}.lead{font-size:12px;color:#555;line-height:1.6;font-family:sans-serif;margin-bottom:14px}.item{font-size:12px;color:#222;line-height:1.55;font-family:sans-serif;margin-bottom:5px;padding:8px 12px;background:#fff;border-left:3px solid #1a3a5c}.ft{background:#eceae6;padding:6px 24px;display:flex;justify-content:space-between;font-size:9px;color:#888;font-family:sans-serif}@media print{.slide{page-break-after:always}}</style></head><body>');
+  S.slides.forEach(function(s,i){
+    w.document.write('<div class="slide"><div class="top-bar"><span class="ey">'+s.eyebrow+'</span><span class="sn">'+(i+1)+'/'+S.slides.length+'</span></div><div class="body"><div class="acl"><div class="h">'+s.heading+'</div></div><div class="lead">'+s.lead+'</div>');
+    if(s.type==='summary'){ (s.bullets||[]).forEach(function(b){ w.document.write('<div class="item">'+b+'</div>'); }); }
+    if(s.type==='scqa'){ ['Situation','Complication','Question','Hypothesis'].forEach(function(x){ var k=x.toLowerCase(); w.document.write('<div class="item"><strong>'+x+':</strong> '+(s[k]||'')+'</div>'); }); }
+    if(s.type==='ambition'){ w.document.write('<div class="item" style="font-style:italic;font-size:13px">'+(s.northstar||'')+'</div>'); (s.outcomes||[]).forEach(function(o){ w.document.write('<div class="item">'+o+'</div>'); }); }
+    if(s.type==='options'){ (s.options||[]).forEach(function(o){ w.document.write('<div class="item"><strong>'+o.label+'</strong> ['+o.verdict+'] — '+o.desc+'</div>'); }); }
+    if(s.type==='priorities'){ (s.priorities||[]).forEach(function(p,j){ w.document.write('<div class="item"><strong>0'+(j+1)+' '+p.title+'</strong><br/>'+p.desc+'</div>'); }); }
+    if(s.type==='capabilities'){ (s.capabilities||[]).forEach(function(c){ w.document.write('<div class="item">'+c.name+' — '+(c.action||'Build')+'</div>'); }); }
+    if(s.type==='roadmap'){ (s.horizons||[]).forEach(function(hz){ w.document.write('<div class="item"><strong>'+hz.badge+' · '+hz.title+'</strong><br/>'+hz.desc+'</div>'); }); }
+    w.document.write('</div><div class="ft"><span>'+S.org+' · Strategy Brief · Confidential</span><span>AI-generated — validate before official use</span></div></div>');
+  });
+  w.document.write('</body></html>'); w.document.close();
+  setTimeout(function(){ w.print(); },700);
+}
+
+// ── Fallback slides ────────────────────────────
+function fallbackSlides(){
+  var pl=(S.priorities||'').split('\n').filter(Boolean).slice(0,3);
+  while(pl.length<3) pl.push('Strategic initiative '+(pl.length+1));
+  return [
+    {tab:'01 · Executive summary',eyebrow:'Executive summary',heading:S.northStar||'Strategic direction for '+S.org,lead:'This brief sets out the strategic direction for '+S.org+' over the next '+S.horizon+'. Built on a structured SCQA problem analysis and validated through MECE option assessment.',type:'summary',bullets:['The core complication demands an immediate and structured strategic response','Our hypothesis has been tested against four MECE options — one clear path emerges','Three priorities will concentrate our energy over the planning horizon']},
+    {tab:'02 · The situation',eyebrow:'Situation & complication',heading:'Understanding the core challenge',lead:'Great strategy begins with honest diagnosis. The SCQA framework anchors our response in agreed reality.',type:'scqa',situation:S.situation,complication:S.complication,question:S.keyQuestion,hypothesis:S.hypothesis},
+    {tab:'03 · Strategic ambition',eyebrow:'Strategic ambition',heading:'Where we are going',lead:'Our north star defines every strategic choice we make over the planning horizon.',type:'ambition',northstar:S.northStar,outcomes:(S.outcomes||'').split(/[.\n]/).filter(Boolean).slice(0,3)},
+    {tab:'04 · Strategic options',eyebrow:'Strategic options',heading:'Four paths — one clear recommendation',lead:'MECE analysis of all realistic strategic paths.',type:'options',options:[{label:'Option A',desc:'First path from MECE analysis',verdict:'recommended'},{label:'Option B',desc:'Second path',verdict:'viable'},{label:'Option C',desc:'Third path',verdict:'not recommended'}]},
+    {tab:'05 · Strategic priorities',eyebrow:'Strategic priorities',heading:'Three bets that define us',lead:'Three high-conviction priorities concentrate our energy.',type:'priorities',priorities:pl.map((p,i)=>({num:'0'+(i+1),title:p.replace(/^\d+[\.\)]\s*/,''),desc:'Directly addresses the core complication.',timeframe:['Year 1','Year 1–2','Year 2–3'][i]}))},
+    {tab:'06 · Capability agenda',eyebrow:'Capability agenda',heading:'What we must build to win',lead:'Our ambition demands capabilities we do not fully have today.',type:'capabilities',capabilities:(S.capabilities||'digital, talent, data').split(',').map(c=>({name:c.trim(),action:'Build',urgency:Math.floor(65+Math.random()*25)}))},
+    {tab:'07 · Roadmap',eyebrow:'Execution roadmap',heading:'Three horizons of delivery',lead:'We sequence our bets to build momentum early while investing in transformation.',type:'roadmap',horizons:[{badge:'H1 · Year 1',badgeClass:'h1c',title:'Stabilise & launch',desc:'Secure foundations, deliver quick wins, align behind the strategy.'},{badge:'H2 · Year 2',badgeClass:'h2c',title:'Scale & differentiate',desc:'Scale initiatives, deepen capabilities, expand market position.'},{badge:'H3 · '+S.horizon,badgeClass:'h3c',title:'Lead & transform',desc:'Full ambition realised — transformed capabilities and market leadership.'}],risk:S.risk}
+  ];
+}
+
+// ── Init ───────────────────────────────────────
+if(!loadFromLink()){
+  goTo('s-welcome');
+}
+</script>
+</body>
+</html>
